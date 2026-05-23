@@ -99,6 +99,8 @@ namespace NOBlackBox
             UpdateAircraft();
             UpdateState();
             UpdateTargets();
+            ResearchReflectionProbe.DumpEW(unit);
+            ResearchReflectionProbe.DumpDetection(unit);
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
             timer = 0;
@@ -143,6 +145,8 @@ namespace NOBlackBox
                     if (Configuration.ResearchLoggingEnabled.Value)
                         Plugin.Logger?.LogInfo($"[R] AC SKIP LockedTarget (targets={targets.Length} <= 1)");
                 }
+
+                ResearchReflectionProbe.DumpTargets(targets, aircraft.definition.code, aircraft.persistentID.Id);
             }
         }
 

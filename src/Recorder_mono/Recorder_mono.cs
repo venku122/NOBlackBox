@@ -32,6 +32,7 @@ namespace NOBlackBox
         private Unit[] units = [];
         private BulletSim[] bulletSims = [];
         private bool processUnits = false;
+        private HashSet<long> fieldsDumped = new();
         private bool processBulletSims = false;
         private bool processShockWaves = false;
         
@@ -92,6 +93,12 @@ namespace NOBlackBox
             {
                 foreach (var unit in units)
                 {
+                    if (Configuration.ResearchDumpApiFields.Value)
+                    {
+                        if (fieldsDumped.Add(unit.persistentID.Id))
+                            ResearchReflectionProbe.DumpUnitFields(unit);
+                    }
+
                     if (!unit.networked || (unit.disabled && unit.GetType() != typeof(Missile)))
                     {
                         continue;
@@ -99,7 +106,7 @@ namespace NOBlackBox
                     bool isNew = false;
                     if (!unitObjects.TryGetValue(unit.persistentID.Id, out GameObject acmi))
                     {
-                        
+
                         switch (unit)
                         {
                             case Aircraft aircraft:
@@ -196,7 +203,6 @@ namespace NOBlackBox
                             default:
                                 break;
                         }
-                        //acmi = new GameObject();
                     }
                 }
                 processUnits = false;

@@ -57,6 +57,7 @@ namespace NOBlackBox
         }
         private void Awake()
         {
+            UnityEngine.Debug.Log("[NOBB] Plugin.Awake() start");
             GameObject managerObject = Chainloader.ManagerObject;
             bool flag = managerObject != null;
             if (flag)
@@ -69,6 +70,11 @@ namespace NOBlackBox
             if (Configuration.EnableLogging.Value == true)
             {
                 Logger = base.Logger;
+                Logger.LogInfo("[NOBB] Plugin.Logger initialized");
+            }
+            else
+            {
+                UnityEngine.Debug.Log("[NOBB] EnableLogging is FALSE — Logger will be null");
             }
 
             foreach (string key in NOBlackBoxUnitInfo.Keys)
@@ -155,6 +161,7 @@ namespace NOBlackBox
                 return;
             }
             isRecording = true;
+            UnityEngine.Debug.Log($"[NOBB] StartRecording called. isRecording={isRecording} recordingManually={recordingManually} MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}");
             if (Configuration.ResearchLoggingEnabled.Value)
                 Plugin.Logger?.LogInfo($"[R] StartRecording AutoStartRecording={Configuration.AutoStartRecording.Value} recordingManually={recordingManually}");
             recorderMono = new GameObject();

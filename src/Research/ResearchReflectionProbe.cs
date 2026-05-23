@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
@@ -169,6 +170,111 @@ namespace NOBlackBox
 
                 int nonNetworked = allUnits.Length - networkedCount;
                 w.WriteLine($"{Time.time:F2},{allUnits.Length},{buildingCount},{sceneryCount},{otherCount},{networkedCount},{nonNetworked}");
+            }
+        }
+
+        private static readonly string[] ewKeywords = new[] { "jam", "ecm", "ew", "noise", "rwr", "chaff", "flar", "irJam", "countermeasure", "cm" };
+        private static readonly string[] detectionKeywords = new[] { "detect", "datalink", "sensor", "trackedBy", "radarContact", "spot", "lock", "spotted", "aware" };
+        private static Dictionary<long, float> lastEwDump = new();
+        private static Dictionary<long, float> lastDetDump = new();
+
+        private static bool ShouldDumpEW(long unitId)
+        {
+            float interval = Configuration.ResearchDumpIntervalSeconds.Value;
+            if (lastEwDump.TryGetValue(unitId, out float last) && (Time.time - last) < interval)
+                return false;
+            lastEwDump[unitId] = Time.time;
+            return true;
+        }
+
+        private static bool ShouldDumpDetection(long unitId)
+        {
+            float interval = Configuration.ResearchDumpIntervalSeconds.Value;
+            if (lastDetDump.TryGetValue(unitId, out float last) && (Time.time - last) < interval)
+                return false;
+            lastDetDump[unitId] = Time.time;
+            return true;
+        }
+
+        public static void DumpEW(Unit unit)
+        {
+            if (!Configuration.ResearchDumpEW.Value) return;
+            if (!ShouldDumpEW(unit.persistentID.Id)) return;
+
+            EnsureDumpDir();
+            string path = Path.Combine(dumpDir, "ew.csv");
+            bool header = !File.Exists(path);
+
+            using (var w = File.AppendText(path))
+            {
+                if (header)
+                    w.WriteLine("time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue");
+
+                DumpFieldsMatching(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code,
+                    unit.GetType().Name, ewKeywords);
+            }
+        }
+
+        public static void DumpDetection(Unit unit)
+        {
+            if (!Configuration.ResearchDumpDetection.Value) return;
+            if (!ShouldDumpDetection(unit.persistentID.Id)) return;
+
+            EnsureDumpDir();
+            string path = Path.Combine(dumpDir, "detection.csv");
+            bool header = !File.Exists(path);
+
+            using (var w = File.AppendText(path))
+            {
+                if (header)
+                    w.WriteLine("time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue");
+
+                DumpFieldsMatching(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code,
+                    unit.GetType().Name, detectionKeywords);
+            }
+        }
+
+        private static void DumpFieldsMatching(StreamWriter w, object obj, long unitId, string unitName, string code, string typeName, string[] keywords)
+        {
+            var seen = new HashSet<string>();
+            Type t = obj.GetType();
+
+            while (t != null && t != typeof(object))
+            {
+                foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
+                    if (seen.Contains(f.Name)) continue;
+                    seen.Add(f.Name);
+
+                    if (!keywords.Any(k => f.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0))
+                        continue;
+
+                    try
+                    {
+                        object val = f.GetValue(obj);
+                        string valStr = FormatValue(val);
+                        w.WriteLine($"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}");
+                    }
+                    catch { }
+                }
+                foreach (PropertyInfo p in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
+                    if (seen.Contains(p.Name)) continue;
+                    seen.Add(p.Name);
+
+                    if (!keywords.Any(k => p.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0))
+                        continue;
+
+                    try
+                    {
+                        if (p.GetIndexParameters().Length > 0) continue;
+                        object val = p.GetValue(obj);
+                        string valStr = FormatValue(val);
+                        w.WriteLine($"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}");
+                    }
+                    catch { }
+                }
+                t = t.BaseType;
             }
         }
 

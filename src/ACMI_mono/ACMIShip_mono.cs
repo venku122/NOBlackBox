@@ -82,6 +82,8 @@ namespace NOBlackBox
             UpdatePose();
             UpdateTargets();
             UpdateState();
+            ResearchReflectionProbe.DumpEW(unit);
+            ResearchReflectionProbe.DumpDetection(unit);
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
             timer = 0;
@@ -149,6 +151,8 @@ namespace NOBlackBox
                     if (Configuration.ResearchLoggingEnabled.Value)
                         Plugin.Logger?.LogInfo($"[R] SH SKIP LockedTarget (targets={targets.Length} <= 1)");
                 }
+
+                ResearchReflectionProbe.DumpTargets(targets, ship.definition.unitName, unit.persistentID.Id);
             }
             targets = [];
         }

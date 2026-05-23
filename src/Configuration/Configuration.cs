@@ -137,13 +137,13 @@ namespace NOBlackBox
         internal static ConfigEntry<bool> DestructionEvents;
 
         // Research probe toggles (local development only — never upstream)
-        internal const bool DefaultResearchLoggingEnabled = false;
+        internal const bool DefaultResearchLoggingEnabled = true;
         internal const float DefaultResearchDumpIntervalSeconds = 1f;
-        internal const bool DefaultResearchDumpApiFields = false;
-        internal const bool DefaultResearchDumpTargets = false;
-        internal const bool DefaultResearchDumpEW = false;
-        internal const bool DefaultResearchDumpDetection = false;
-        internal const bool DefaultResearchDumpBuildings = false;
+        internal const bool DefaultResearchDumpApiFields = true;
+        internal const bool DefaultResearchDumpTargets = true;
+        internal const bool DefaultResearchDumpEW = true;
+        internal const bool DefaultResearchDumpDetection = true;
+        internal const bool DefaultResearchDumpBuildings = true;
 
         internal static ConfigEntry<bool> ResearchLoggingEnabled;
         internal static ConfigEntry<float> ResearchDumpIntervalSeconds;
