@@ -40,6 +40,7 @@ namespace NOBlackBox
         internal const bool DefaultRecordPilotHead = true;
         internal const bool DefaultCompressIDs = false;
         internal const bool DefaultRecordExtraTelemetry = true;
+        internal const bool DefaultRecordLaserDesignator = true;
 
         internal const bool DefaultEnableLogging = false;
         
@@ -104,6 +105,7 @@ namespace NOBlackBox
         internal static ConfigEntry<bool> RecordLandingGear;
         internal static ConfigEntry<bool> RecordPilotHead;
         internal static ConfigEntry<bool> RecordExtraTelemetry;
+        internal static ConfigEntry<bool> RecordLaserDesignator;
 
         internal static ConfigEntry<int> HeightMapResolution;
         internal static ConfigEntry<int> MetersPerScan;
@@ -298,6 +300,9 @@ namespace NOBlackBox
 
             RecordExtraTelemetry = config.Bind(OptionalDataSettings, "RecordExtraTelemetry", DefaultRecordExtraTelemetry, "Toggle recording Extra Telemetry. Default: true");
             Plugin.Logger?.LogDebug($"RecordExtraTelemetry = {RecordExtraTelemetry?.Value}");
+
+            RecordLaserDesignator = config.Bind(OptionalDataSettings, "RecordLaserDesignator", DefaultRecordLaserDesignator, "Toggle recording laser designator active state. Default: true");
+            Plugin.Logger?.LogDebug($"RecordLaserDesignator = {RecordLaserDesignator?.Value}");
 
             _CompressIDs = config.Bind(OptionalDataSettings, "CompressIDs", DefaultCompressIDs, "Compress IDs to reduce filesize with less determinism.");
             Plugin.Logger?.LogDebug($"CompressIDs = {_CompressIDs.Value}");
