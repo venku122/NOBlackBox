@@ -107,7 +107,7 @@ namespace NOBlackBox
         internal override void UpdateTargets()
         {
             targets = aircraft.weaponManager.GetTargetList().ToArray();
-            if (targets.Any() && targets != lastTargets)
+            if (targets.Any() && !targets.SequenceEqual(lastTargets))
             {
                 lastTargets = targets;
                 int max = targets.Length;
