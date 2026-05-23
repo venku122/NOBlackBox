@@ -110,7 +110,7 @@ namespace NOBlackBox
                 }
                 else
                 {
-                    if (lastTargets == targets)
+                    if (lastTargets.SequenceEqual(targets))
                     {
                         return;
                     }
