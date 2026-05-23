@@ -248,7 +248,7 @@ namespace NOBlackBox
                 throw new ArgumentException("Directory path cannot be null or empty.", nameof(directoryPath));
 
             if (!Directory.Exists(directoryPath))
-                throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
+                return Enumerable.Empty<string>();
 
             return Directory
                 .EnumerateFiles(directoryPath, "*.txt", SearchOption.TopDirectoryOnly)
