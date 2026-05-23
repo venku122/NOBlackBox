@@ -13,6 +13,7 @@ namespace NOBlackBox
         internal const string HeightMapGeneratorSettings = "Heightmap Generator Settings";
         internal const string VisualSettings = "Visual Settings";
         internal const string DeveloperFeatures = "Developer Features";
+        internal const string ResearchSettings = "Research";
 
         internal const int DefaultUpdateRate = 5;
 
@@ -134,6 +135,23 @@ namespace NOBlackBox
 
         internal static readonly bool DefaultDestructionEvents = true;
         internal static ConfigEntry<bool> DestructionEvents;
+
+        // Research probe toggles (local development only — never upstream)
+        internal const bool DefaultResearchLoggingEnabled = false;
+        internal const float DefaultResearchDumpIntervalSeconds = 1f;
+        internal const bool DefaultResearchDumpApiFields = false;
+        internal const bool DefaultResearchDumpTargets = false;
+        internal const bool DefaultResearchDumpEW = false;
+        internal const bool DefaultResearchDumpDetection = false;
+        internal const bool DefaultResearchDumpBuildings = false;
+
+        internal static ConfigEntry<bool> ResearchLoggingEnabled;
+        internal static ConfigEntry<float> ResearchDumpIntervalSeconds;
+        internal static ConfigEntry<bool> ResearchDumpApiFields;
+        internal static ConfigEntry<bool> ResearchDumpTargets;
+        internal static ConfigEntry<bool> ResearchDumpEW;
+        internal static ConfigEntry<bool> ResearchDumpDetection;
+        internal static ConfigEntry<bool> ResearchDumpBuildings;
 
 #pragma warning restore
 
@@ -420,6 +438,35 @@ namespace NOBlackBox
 
             EnableLogging = config.Bind(DeveloperFeatures, "EnableLogging", DefaultEnableLogging, "Toggle Logging. Default: false");
             Plugin.Logger?.LogDebug($"EnableLogging = {EnableLogging.Value}");
+
+            // Research section (local development only — never upstream)
+            ResearchLoggingEnabled = config.Bind(ResearchSettings, "ResearchLoggingEnabled",
+                DefaultResearchLoggingEnabled, "Enable verbose research logging.");
+            Plugin.Logger?.LogDebug($"ResearchLoggingEnabled = {ResearchLoggingEnabled.Value}");
+
+            ResearchDumpIntervalSeconds = config.Bind(ResearchSettings, "ResearchDumpIntervalSeconds",
+                DefaultResearchDumpIntervalSeconds, "Seconds between research data dumps.");
+            Plugin.Logger?.LogDebug($"ResearchDumpIntervalSeconds = {ResearchDumpIntervalSeconds.Value}");
+
+            ResearchDumpApiFields = config.Bind(ResearchSettings, "ResearchDumpApiFields",
+                DefaultResearchDumpApiFields, "Dump unknown game object fields via reflection.");
+            Plugin.Logger?.LogDebug($"ResearchDumpApiFields = {ResearchDumpApiFields.Value}");
+
+            ResearchDumpTargets = config.Bind(ResearchSettings, "ResearchDumpTargets",
+                DefaultResearchDumpTargets, "Dump target list contents for all units.");
+            Plugin.Logger?.LogDebug($"ResearchDumpTargets = {ResearchDumpTargets.Value}");
+
+            ResearchDumpEW = config.Bind(ResearchSettings, "ResearchDumpEW",
+                DefaultResearchDumpEW, "Dump electronic warfare / jammer state.");
+            Plugin.Logger?.LogDebug($"ResearchDumpEW = {ResearchDumpEW.Value}");
+
+            ResearchDumpDetection = config.Bind(ResearchSettings, "ResearchDumpDetection",
+                DefaultResearchDumpDetection, "Dump detection/datalink state.");
+            Plugin.Logger?.LogDebug($"ResearchDumpDetection = {ResearchDumpDetection.Value}");
+
+            ResearchDumpBuildings = config.Bind(ResearchSettings, "ResearchDumpBuildings",
+                DefaultResearchDumpBuildings, "Dump building/scenery object counts and types.");
+            Plugin.Logger?.LogDebug($"ResearchDumpBuildings = {ResearchDumpBuildings.Value}");
 
         }
     }
