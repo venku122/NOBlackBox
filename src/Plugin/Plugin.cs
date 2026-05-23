@@ -125,6 +125,8 @@ namespace NOBlackBox
 
             if (!isRecording && MissionManager.IsRunning && !recordingManually)
             {
+                if (Configuration.ResearchLoggingEnabled.Value)
+                    Plugin.Logger?.LogInfo($"[R] AutoStartTrigger MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}");
                 StartRecording();
             }
             
@@ -153,6 +155,8 @@ namespace NOBlackBox
                 return;
             }
             isRecording = true;
+            if (Configuration.ResearchLoggingEnabled.Value)
+                Plugin.Logger?.LogInfo($"[R] StartRecording AutoStartRecording={Configuration.AutoStartRecording.Value} recordingManually={recordingManually}");
             recorderMono = new GameObject();
             recorderMono.AddComponent<Recorder_mono>();
             recorderMono.GetComponent<Recorder_mono>().enabled = true;
@@ -174,6 +178,8 @@ namespace NOBlackBox
                 return;
             }
             isRecording = false;
+            if (Configuration.ResearchLoggingEnabled.Value)
+                Plugin.Logger?.LogInfo($"[R] StopRecording");
             recorderMono.GetComponent<Recorder_mono>().enabled = false;
             GameObject.Destroy(autoSaveCountDown);
             GameObject.Destroy(recorderMono);

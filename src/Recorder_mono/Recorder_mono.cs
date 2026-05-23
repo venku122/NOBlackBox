@@ -74,6 +74,12 @@ namespace NOBlackBox
             Plugin.Logger?.LogDebug("STARTED MONO RECORDER");
             Plugin.recordingManually = false;
 
+            if (Configuration.ResearchLoggingEnabled.Value)
+            {
+                string mission = MissionManager.CurrentMission?.Name ?? "unknown";
+                Plugin.Logger?.LogInfo($"[R] Recorder_Awake mission=\"{mission}\" AutoStartRecording={Configuration.AutoStartRecording.Value}");
+            }
+
         }
         void Update()
         {
@@ -194,6 +200,12 @@ namespace NOBlackBox
                     }
                 }
                 processUnits = false;
+
+                if (Configuration.ResearchDumpBuildings.Value)
+                    ResearchReflectionProbe.DumpBuildingCounts(units);
+
+                if (Configuration.ResearchLoggingEnabled.Value)
+                    Plugin.Logger?.LogInfo($"[R] UnitDiscovery: {units.Length} units, {unitObjects.Count} tracked");
             }
             if (processBulletSims)
             {

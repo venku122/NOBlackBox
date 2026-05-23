@@ -1,0 +1,16 @@
+<Project>
+  <ItemGroup>
+    <Reference Update="Assembly-CSharp">
+      <HintPath>$(NUCLEAR_OPTION_ROOT)/NuclearOption_Data/Managed/Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Update="BepInEx">
+      <HintPath>$(NUCLEAR_OPTION_ROOT)/BepInEx/core/BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Update="Mirage">
+      <HintPath>$(NUCLEAR_OPTION_ROOT)/NuclearOption_Data/Managed/Mirage.dll</HintPath>
+    </Reference>
+    <Reference Update="UnityEngine">
+      <HintPath>$(NUCLEAR_OPTION_ROOT)/NuclearOption_Data/Managed/UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

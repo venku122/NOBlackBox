@@ -109,6 +109,12 @@ namespace NOBlackBox
             targets = aircraft.weaponManager.GetTargetList().ToArray();
             if (targets.Any() && targets != lastTargets)
             {
+                if (Configuration.ResearchLoggingEnabled.Value)
+                {
+                    string targetIds = string.Join(", ", targets.Where(t => t != null).Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture)));
+                    Plugin.Logger?.LogInfo($"[R] AC {aircraft.definition.code} targets={targets.Length} ids=[{targetIds}]");
+                }
+
                 lastTargets = targets;
                 int max = targets.Length;
                 if (max > 10)
@@ -117,7 +123,8 @@ namespace NOBlackBox
                 }
                 if (targets.Length > 1)
                 {
-                    
+                    if (Configuration.ResearchLoggingEnabled.Value)
+                        Plugin.Logger?.LogInfo($"[R] AC EMIT LockedTarget (targets={targets.Length})");
                     for (int i = 0; i < max; i++)
                     {
                         if (i == 0)
@@ -130,6 +137,11 @@ namespace NOBlackBox
                         }
                             props.Add(lockedTargetString, $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}");
                     }
+                }
+                else
+                {
+                    if (Configuration.ResearchLoggingEnabled.Value)
+                        Plugin.Logger?.LogInfo($"[R] AC SKIP LockedTarget (targets={targets.Length} <= 1)");
                 }
             }
         }
