@@ -115,7 +115,7 @@ namespace NOBlackBox
                 {
                     max = 10;
                 }
-                if (targets.Length > 1)
+                if (targets.Length > 0)
                 {
                     
                     for (int i = 0; i < max; i++)
