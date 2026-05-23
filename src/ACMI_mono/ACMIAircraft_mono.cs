@@ -27,6 +27,7 @@ namespace NOBlackBox
 
         private bool lastGear = false;
         private bool lastRadar = false;
+        private bool lastLaserDesignatorActive = false;
         private float lastAGL = float.NaN;
         private float lastTAS = float.NaN;
         private float lastAOA = float.NaN;
@@ -191,6 +192,24 @@ namespace NOBlackBox
             {
                 props.Add("RadarMode", aircraft.radar.activated ? "1" : "0");
                 lastRadar = aircraft.radar;
+            }
+
+            if (Configuration.RecordLaserDesignator.Value)
+            {
+                LaserDesignator ld = aircraft.GetLaserDesignator();
+                if (ld != null)
+                {
+                    bool laserActive = ld.enabled && ld.GetLasedTarget() != null;
+                    if (laserActive != lastLaserDesignatorActive)
+                    {
+                        props.Add("LaserDesignatorActive", laserActive ? "1" : "0");
+                        if (laserActive && ld.GetLasedTarget() != null)
+                        {
+                            props.Add("LaserDesignatorTarget", $"{GetTacviewIdOfUnit(ld.GetLasedTarget().persistentID.Id):X}");
+                        }
+                        lastLaserDesignatorActive = laserActive;
+                    }
+                }
             }
 
             if (localAircraft && localAircraft.persistentID == aircraft.persistentID && CameraStateManager.cameraMode == CameraMode.cockpit && Configuration.RecordPilotHead.Value == true)
