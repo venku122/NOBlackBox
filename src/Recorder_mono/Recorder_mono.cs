@@ -103,7 +103,6 @@ namespace NOBlackBox
                     {
                         continue;
                     }
-                    bool isNew = false;
                     if (!unitObjects.TryGetValue(unit.persistentID.Id, out GameObject acmi))
                     {
 
@@ -129,7 +128,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             case Missile missile:
                                 acmi = new GameObject();
@@ -140,7 +139,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             case GroundVehicle vehicle:
                                 acmi = new GameObject();
@@ -151,7 +150,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             case Ship ship:
                                 acmi = new GameObject();
@@ -162,7 +161,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             case PilotDismounted pilot:
                                 if (Configuration.RecordEjectedPilots.Value == true)
@@ -175,7 +174,7 @@ namespace NOBlackBox
                                         $"{unit.definition.unitName}," +
                                         $"{unit.definition.code}");
                                     unitObjects.Add(unit.persistentID.Id, acmi);
-                                    isNew = true;
+    
                                 }
                                 break;
                             case Building building:
@@ -187,7 +186,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             case Scenery scenery:
                                 acmi = new GameObject();
@@ -198,7 +197,7 @@ namespace NOBlackBox
                                     $"{unit.definition.unitName}," +
                                     $"{unit.definition.code}");
                                 unitObjects.Add(unit.persistentID.Id, acmi);
-                                isNew = true;
+
                                 break;
                             default:
                                 break;

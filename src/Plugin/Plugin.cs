@@ -7,7 +7,6 @@ using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using NuclearOption.Networking;
 using UnityEngine;
-
 #if BEP6
 using BepInEx.Unity.Mono;
 #endif
@@ -20,6 +19,7 @@ namespace NOBlackBox
     [BepInProcess("NuclearOptionServer.exe")]
     internal class Plugin : BaseUnityPlugin
     {
+        internal static Plugin Instance;
 
         internal static new ManualLogSource? Logger;
         internal static GameObject ?recorderMono;
@@ -57,6 +57,7 @@ namespace NOBlackBox
         }
         private void Awake()
         {
+            Instance = this;
             UnityEngine.Debug.Log("[NOBB] Plugin.Awake() start");
             GameObject managerObject = Chainloader.ManagerObject;
             bool flag = managerObject != null;
@@ -65,6 +66,12 @@ namespace NOBlackBox
                 managerObject.hideFlags = HideFlags.HideAndDontSave;
                 global::UnityEngine.Object.DontDestroyOnLoad(managerObject);
                 Logger?.LogWarning("Force Hid ManagerGameObject");
+            }
+
+            if (managerObject != null)
+            {
+                managerObject.AddComponent<PluginRuntime>();
+                Plugin.Logger?.LogInfo("[R] PluginRuntime attached to ManagerObject");
             }
             Configuration.InitSettings(Config);
             if (Configuration.EnableLogging.Value == true)
@@ -93,7 +100,13 @@ namespace NOBlackBox
             GameManager.OnGameStateChanged.AddListener(OnGameStateChange);
 
         }
+
         private void Update()
+        {
+            RuntimeUpdate();
+        }
+
+        internal void RuntimeUpdate()
         {
             if (Configuration._GenerateHeightMapKey.Value.IsDown())
             {
@@ -270,6 +283,21 @@ namespace NOBlackBox
                         Path.GetFileName(file),
                         "default.txt",
                         StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    internal class PluginRuntime : MonoBehaviour
+    {
+        void Awake()
+        {
+            UnityEngine.Debug.Log("[NOBB] PluginRuntime.Awake()");
+        }
+
+        void Update()
+        {
+            if (Plugin.Instance == null)
+                return;
+            Plugin.Instance.RuntimeUpdate();
         }
     }
 }

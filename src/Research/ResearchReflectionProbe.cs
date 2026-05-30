@@ -118,7 +118,7 @@ namespace NOBlackBox
             return val.ToString() ?? val.GetType().Name;
         }
 
-        public static void DumpTargets(List<Unit> targets, string sourceUnitName, long sourceUnitId)
+        public static void DumpTargets(Unit[] targets, string sourceUnitName, long sourceUnitId)
         {
             if (!Configuration.ResearchDumpTargets.Value)
                 return;
@@ -135,7 +135,7 @@ namespace NOBlackBox
                 foreach (Unit t in targets)
                 {
                     if (t == null) continue;
-                    w.WriteLine($"{Time.time:F2},{targets.Count},{sourceUnitId},{EscapeCsv(sourceUnitName)},{t.persistentID.Id},{EscapeCsv(t.definition.unitName)},{t.definition.code}");
+                    w.WriteLine($"{Time.time:F2},{targets.Length},{sourceUnitId},{EscapeCsv(sourceUnitName)},{t.persistentID.Id},{EscapeCsv(t.definition.unitName)},{t.definition.code}");
                 }
             }
         }
@@ -212,7 +212,70 @@ namespace NOBlackBox
 
                 DumpFieldsMatching(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code,
                     unit.GetType().Name, ewKeywords);
+
+                DumpWeaponStations(w, unit, header);
             }
+        }
+
+        private static void DumpWeaponStations(StreamWriter w, Unit unit, bool header)
+        {
+            try
+            {
+                FieldInfo wsField = unit.GetType().GetField("weaponStations",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (wsField == null) return;
+
+                object wsObj = wsField.GetValue(unit);
+                if (wsObj == null) return;
+
+                PropertyInfo countProp = wsObj.GetType().GetProperty("Count");
+                PropertyInfo indexer = wsObj.GetType().GetProperty("Item");
+                if (countProp == null || indexer == null) return;
+
+                int count = (int)countProp.GetValue(wsObj);
+                for (int i = 0; i < count; i++)
+                {
+                    object station = indexer.GetValue(wsObj, new object[] { i });
+                    if (station == null) continue;
+
+                    string prefix = $"ws[{i}].";
+                    var seen = new HashSet<string>();
+                    Type t = station.GetType();
+
+                    while (t != null && t != typeof(object))
+                    {
+                        foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                        {
+                            if (seen.Contains(f.Name)) continue;
+                            seen.Add(f.Name);
+
+                            try
+                            {
+                                object val = f.GetValue(station);
+                                string valStr = FormatValue(val);
+                                w.WriteLine($"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}");
+                            }
+                            catch { }
+                        }
+                        foreach (PropertyInfo p in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                        {
+                            if (seen.Contains(p.Name)) continue;
+                            seen.Add(p.Name);
+
+                            try
+                            {
+                                if (p.GetIndexParameters().Length > 0) continue;
+                                object val = p.GetValue(station);
+                                string valStr = FormatValue(val);
+                                w.WriteLine($"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}");
+                            }
+                            catch { }
+                        }
+                        t = t.BaseType;
+                    }
+                }
+            }
+            catch { }
         }
 
         public static void DumpDetection(Unit unit)
