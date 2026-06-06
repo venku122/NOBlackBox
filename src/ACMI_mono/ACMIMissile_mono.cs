@@ -11,9 +11,9 @@ namespace NOBlackBox
     {
         private readonly Dictionary<string, string> TYPES = new()
         {
-            {"MSL", "Weapon+Missile"},
-            {"BOMB", "Weapon+Bomb"},
-            {"SHL", "Projectile+Shell" }
+            { "MSL", "Weapon+Missile" },
+            { "BOMB", "Weapon+Bomb" },
+            { "SHL", "Projectile+Shell" },
         };
 
         FieldInfo warheadField;
@@ -25,10 +25,7 @@ namespace NOBlackBox
         private float lastAOA = float.NaN;
         private uint lastTarget = 0;
 
-        internal bool Detonated
-        {
-            get; private set;
-        }
+        internal bool Detonated { get; private set; }
         Missile missile;
         GameObject shockwave;
 
@@ -57,16 +54,20 @@ namespace NOBlackBox
             {
                 { "Name", base.unit.definition.unitName },
                 { "Coalition", faction?.factionName ?? "Neutral" },
-                { "Color", faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red") },
+                {
+                    "Color",
+                    faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red")
+                },
                 { "Type", info[1] },
                 { "CallSign", $"{missile.definition.unitName} {tacviewId:X}" },
-                { "Debug", lastState.ToString()}
+                { "Debug", lastState.ToString() },
             };
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
             this.enabled = true;
             base.enabled = true;
         }
+
         public override void Update()
         {
             if (!this.enabled || unit.disabled)
@@ -99,7 +100,10 @@ namespace NOBlackBox
             if (unit.speed != lastTAS && Configuration.RecordSpeed.Value == true)
             {
                 props.Add("TAS", unit.speed.ToString("0.##", CultureInfo.InvariantCulture));
-                props.Add("Mach", (unit.speed / 340).ToString("0.##", CultureInfo.InvariantCulture));
+                props.Add(
+                    "Mach",
+                    (unit.speed / 340).ToString("0.##", CultureInfo.InvariantCulture)
+                );
                 lastTAS = unit.speed;
             }
 
@@ -117,7 +121,7 @@ namespace NOBlackBox
                 props.Add("AGL", unit.radarAlt.ToString("0.##", CultureInfo.InvariantCulture));
                 lastAGL = unit.radarAlt;
             }
-            
+
             if (missile.targetID.Id != lastTarget)
             {
                 if (missile.targetID.Id != -1)
@@ -129,7 +133,6 @@ namespace NOBlackBox
                 }
                 else
                     props.Add("LockedTargetMode", "0");
-
 
                 lastTarget = missile.targetID.Id;
             }

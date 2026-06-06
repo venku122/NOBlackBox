@@ -11,8 +11,14 @@ namespace NOBlackBox
     internal class ACMIShockwave_mono : ACMIObject_mono
     {
         private static int SHOCKWAVEID = 0;
-        private static readonly FieldInfo propagation = typeof(Shockwave).GetField("blastPropagation", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly FieldInfo blastRadiusField = typeof(Shockwave).GetField("blastRadius", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo propagation = typeof(Shockwave).GetField(
+            "blastPropagation",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
+        private static readonly FieldInfo blastRadiusField = typeof(Shockwave).GetField(
+            "blastRadius",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
 
         private float blastRadius = 0f;
 
@@ -32,7 +38,9 @@ namespace NOBlackBox
             (float lat, float lon) = Helpers.CartesianToGeodetic(pos.GlobalX(), pos.GlobalZ());
             props = new Dictionary<string, string>()
             {
-                { "T", $"{
+                {
+                    "T",
+                    $"{
                     lon.ToString(CultureInfo.InvariantCulture)
                 }|{
                     lat.ToString(CultureInfo.InvariantCulture)
@@ -42,8 +50,9 @@ namespace NOBlackBox
                     pos.GlobalX().ToString("0.##", CultureInfo.InvariantCulture)
                 }|{
                     pos.GlobalZ().ToString("0.##", CultureInfo.InvariantCulture)
-                }" },
-                { "Type", "Misc+Explosion" }
+                }"
+                },
+                { "Type", "Misc+Explosion" },
             };
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
@@ -61,8 +70,15 @@ namespace NOBlackBox
                 }
                 float radius = MathF.Round(((float)propagation.GetValue(shockwave)), 2);
                 waveSpeed = (radius - lastRadius) / timer;
-                
-                if (radius == lastRadius || !shockwave.enabled || !shockwave || waveSpeed <= 0f || radius >= blastRadius || (blastRadius <= 1000 && shockWaveTimer > 3f))
+
+                if (
+                    radius == lastRadius
+                    || !shockwave.enabled
+                    || !shockwave
+                    || waveSpeed <= 0f
+                    || radius >= blastRadius
+                    || (blastRadius <= 1000 && shockWaveTimer > 3f)
+                )
                 {
                     DisableShockWave();
                 }
@@ -71,18 +87,22 @@ namespace NOBlackBox
                 props = [];
                 timer = 0f;
                 lastRadius = radius;
-                Plugin.Logger?.LogDebug($"Shockwave {SHOCKWAVEID.ToString(CultureInfo.InvariantCulture)}Blast Radius: {blastRadius.ToString(CultureInfo.InvariantCulture)}, Current Radius: {radius.ToString(CultureInfo.InvariantCulture)}, Speed: {waveSpeed.ToString(CultureInfo.InvariantCulture)}");
-            } catch
+                Plugin.Logger?.LogDebug(
+                    $"Shockwave {SHOCKWAVEID.ToString(CultureInfo.InvariantCulture)}Blast Radius: {blastRadius.ToString(CultureInfo.InvariantCulture)}, Current Radius: {radius.ToString(CultureInfo.InvariantCulture)}, Speed: {waveSpeed.ToString(CultureInfo.InvariantCulture)}"
+                );
+            }
+            catch
             {
                 DisableShockWave();
             }
-
         }
 
         private void DisableShockWave()
         {
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterRemove(this);
-            Plugin.Logger?.LogDebug($"DISABLING SHOCKWAVE {unitId.ToString(CultureInfo.InvariantCulture)}");
+            Plugin.Logger?.LogDebug(
+                $"DISABLING SHOCKWAVE {unitId.ToString(CultureInfo.InvariantCulture)}"
+            );
             this.enabled = false;
             base.enabled = false;
             props = [];

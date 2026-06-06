@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>NOBlackBox</AssemblyName>
@@ -19,7 +18,9 @@
     <NoWarn>BepInEx002</NoWarn>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Configurations>Debug-Bep6;Release-Bep6;Debug-Bep5;Release-Bep5</Configurations>
-    <NuclearOptionRoot Condition="'$(NuclearOptionRoot)' == ''">D:\SteamLibrary\steamapps\common\Nuclear Option Puppet</NuclearOptionRoot>
+    <NuclearOptionRoot Condition="'$(NuclearOptionRoot)' == ''"
+      >D:\SteamLibrary\steamapps\common\Nuclear Option Puppet</NuclearOptionRoot
+    >
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug-Bep5' Or '$(Configuration)'=='Debug-Bep6'">
@@ -45,7 +46,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug-Bep6' Or '$(Configuration)'=='Release-Bep6'">
-    <PackageReference Include="BepInEx.Unity.Mono" Version="6.0.0-be.732" IncludeAssets="compile" PrivateAssets="all" />
+    <PackageReference
+      Include="BepInEx.Unity.Mono"
+      Version="6.0.0-be.732"
+      IncludeAssets="compile"
+      PrivateAssets="all"
+    />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug-Bep5' Or '$(Configuration)'=='Release-Bep5'">
@@ -53,7 +59,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference
+      Include="Microsoft.NETFramework.ReferenceAssemblies"
+      Version="1.0.2"
+      PrivateAssets="all"
+    />
   </ItemGroup>
 
   <ItemGroup>

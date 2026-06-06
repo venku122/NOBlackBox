@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using UnityEngine;
-
 using static MapSettingsManager;
 
 namespace NOBlackBox
@@ -15,10 +14,14 @@ namespace NOBlackBox
         private static string? textureFileName;
         private static string? customHeightMapListXMLFileName;
         private static string? customTextureListXMLFileName;
-        private static string outputDir = Path.Combine(BepInEx.Paths.PluginPath, "NOBlackBox\\Developer");
+        private static string outputDir = Path.Combine(
+            BepInEx.Paths.PluginPath,
+            "NOBlackBox\\Developer"
+        );
         private static string CombinedCustomHeightMapListXMLPath = Path.Combine(
-                                                                        BepInEx.Paths.PluginPath,
-                                                                        "NOBlackBox\\Developer\\NuclearOption_Heightmaps.xml");
+            BepInEx.Paths.PluginPath,
+            "NOBlackBox\\Developer\\NuclearOption_Heightmaps.xml"
+        );
         private static int textureSize = Configuration.HeightMapResolution.Value;
         private static float terrainSize = 0;
         private static int metersPerRay = Configuration.MetersPerScan.Value;
@@ -33,11 +36,9 @@ namespace NOBlackBox
         private static float terrainYHalfInDegrees = 0;
         private static readonly int STATICS = LayerMask.NameToLayer("Statics");
 
-
         private static Texture2D? texture;
         private static Camera? renderCam;
         private static RenderTexture? renderCamTexture;
-
 
         private static void SetupRenderCam()
         {
@@ -46,7 +47,12 @@ namespace NOBlackBox
                 renderCamTexture.Release();
             }
 
-            renderCamTexture = new RenderTexture(textureSize, textureSize, 24, RenderTextureFormat.ARGB32);
+            renderCamTexture = new RenderTexture(
+                textureSize,
+                textureSize,
+                24,
+                RenderTextureFormat.ARGB32
+            );
             renderCamTexture.enableRandomWrite = true;
             renderCamTexture.Create();
 
@@ -72,7 +78,12 @@ namespace NOBlackBox
             renderCam.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // look down
             renderCam.Render();
             RenderTexture.active = renderCamTexture;
-            texture.ReadPixels(new Rect(0, 0, renderCamTexture.width, renderCamTexture.height), 0, 0, false);
+            texture.ReadPixels(
+                new Rect(0, 0, renderCamTexture.width, renderCamTexture.height),
+                0,
+                0,
+                false
+            );
             texture.Apply();
             RenderTexture.active = null;
             renderCam.targetTexture.Release();
@@ -83,16 +94,19 @@ namespace NOBlackBox
             //do checks
             if (Configuration.EnableHeightmapGenerator.Value == false)
             {
-                Plugin.Logger?.LogDebug("HeightmapGenerator is disabled. Enable it in NOBlackBox Configuration settings by setting EnableHeightmapGenerator = true");
+                Plugin.Logger?.LogDebug(
+                    "HeightmapGenerator is disabled. Enable it in NOBlackBox Configuration settings by setting EnableHeightmapGenerator = true"
+                );
                 return;
             }
             if (null == MissionManager.CurrentMission)
             {
-                Plugin.Logger?.LogDebug("No Terrain found. In order to use this feature, you must launch a mission first.");
+                Plugin.Logger?.LogDebug(
+                    "No Terrain found. In order to use this feature, you must launch a mission first."
+                );
                 return;
             }
             try
-
             {
                 var allGameObjects = GameObject.FindObjectsOfType<GameObject>();
                 foreach (GameObject o in allGameObjects)
@@ -112,35 +126,48 @@ namespace NOBlackBox
 
                 string currentMapName = MapSettingsManager.i.MapLoader.CurrentMap.Path;
 
-                heightmapFileName = HeightmapsBasePath + $"NuclearOption_heightmap_{currentMapName}.raw";
-                customHeightMapListXMLFileName = HeightmapsBasePath + $"NuclearOption_heightmap_{currentMapName}.xml";
+                heightmapFileName =
+                    HeightmapsBasePath + $"NuclearOption_heightmap_{currentMapName}.raw";
+                customHeightMapListXMLFileName =
+                    HeightmapsBasePath + $"NuclearOption_heightmap_{currentMapName}.xml";
 
                 textureFileName = TexturesBasePath + $"NuclearOption_texture_{currentMapName}.png";
-                customTextureListXMLFileName = TexturesBasePath + $"NuclearOption_texture_{currentMapName}.xml";
+                customTextureListXMLFileName =
+                    TexturesBasePath + $"NuclearOption_texture_{currentMapName}.xml";
 
-                FieldInfo MapInScene = typeof(MapSettingsManager).GetField("mapInScene", BindingFlags.Instance | BindingFlags.NonPublic);
+                FieldInfo MapInScene = typeof(MapSettingsManager).GetField(
+                    "mapInScene",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
                 MapSettings map = (MapSettings)MapInScene.GetValue(MapSettingsManager.i);
                 GameObject mapHost = map.gameObject;
 
                 // find minimum and maximum terrain height. shoutout to TYKUHN2 ^^
                 // this is not necessary for the current method, but useful for debugging
                 maxHeight =
-                    mapHost.GetComponentsInChildren<MeshCollider>()
-                    .Where(collider => collider.gameObject.layer == STATICS && collider.gameObject.GetComponents<Component>().Length == 4)
-                    .Select(collider => collider.bounds.max.GlobalY())
-                    .Max() - Datum.originPosition.GlobalY();
+                    mapHost
+                        .GetComponentsInChildren<MeshCollider>()
+                        .Where(collider =>
+                            collider.gameObject.layer == STATICS
+                            && collider.gameObject.GetComponents<Component>().Length == 4
+                        )
+                        .Select(collider => collider.bounds.max.GlobalY())
+                        .Max() - Datum.originPosition.GlobalY();
                 minHeight =
-                    mapHost.GetComponentsInChildren<MeshCollider>()
-                    .Where(collider => collider.gameObject.layer == STATICS && collider.gameObject.GetComponents<Component>().Length == 4)
-                    .Select(collider => collider.bounds.min.GlobalY())
-                    .Min() - Datum.originPosition.GlobalY();
+                    mapHost
+                        .GetComponentsInChildren<MeshCollider>()
+                        .Where(collider =>
+                            collider.gameObject.layer == STATICS
+                            && collider.gameObject.GetComponents<Component>().Length == 4
+                        )
+                        .Select(collider => collider.bounds.min.GlobalY())
+                        .Min() - Datum.originPosition.GlobalY();
 
                 Plugin.Logger?.LogDebug("Attempting to export custom terrain heightmap");
                 Map thisMap = null;
                 Plugin.Logger?.LogDebug("Looping through MapSettingsManager.i.Maps..");
                 foreach (Map map_ in MapSettingsManager.i.Maps)
                 {
-
                     Plugin.Logger?.LogDebug($"checking {map_.Prefab.name}");
                     if (map_.Prefab.name == MapSettingsManager.i.MapLoader.CurrentMap.Path)
                     {
@@ -168,8 +195,6 @@ namespace NOBlackBox
                 terrainXHalf = thisMap.Prefab.MapSize.x / 2;
                 terrainYHalf = thisMap.Prefab.MapSize.y / 2;
 
-
-
                 /*
                  * needed for Tacview xml
                     1 degree° = 60 arc minutes '
@@ -193,7 +218,9 @@ namespace NOBlackBox
             }
             catch (Exception ex)
             {
-                Plugin.Logger?.LogError($"Error exporting heightmap: {ex.Message}\n{ex.StackTrace}");
+                Plugin.Logger?.LogError(
+                    $"Error exporting heightmap: {ex.Message}\n{ex.StackTrace}"
+                );
             }
         }
 
@@ -212,20 +239,40 @@ namespace NOBlackBox
             for (int z = (int)(-1 * terrainHalf); z < terrainHalf; z += metersPerRay)
             {
                 Plugin.Logger?.LogDebug($"{((z + terrainHalf) / terrainSize) * 100}%");
-                if (z + metersPerRay > terrainSize - 1) { z = (int)(terrainSize - 1); }
+                if (z + metersPerRay > terrainSize - 1)
+                {
+                    z = (int)(terrainSize - 1);
+                }
                 for (int x = (int)(-1 * terrainHalf); x < terrainHalf; x += metersPerRay)
                 {
-                    if (x + metersPerRay > terrainSize - 1) { x = (int)(terrainSize - 1); }
+                    if (x + metersPerRay > terrainSize - 1)
+                    {
+                        x = (int)(terrainSize - 1);
+                    }
                     posX = (int)((x + (terrainHalf)) * terrainScale);
-                    if (posX > textureSize - 1) { posX = textureSize - 1; }
+                    if (posX > textureSize - 1)
+                    {
+                        posX = textureSize - 1;
+                    }
                     posZ = (int)((z + (terrainHalf)) * terrainScale);
-                    if (posZ > textureSize - 1) { posZ = textureSize - 1; }
+                    if (posZ > textureSize - 1)
+                    {
+                        posZ = textureSize - 1;
+                    }
 
                     Vector3 target = new GlobalPosition(x, maxHeight + 1, z).ToLocalPosition();
                     RaycastHit hit;
                     if (oldPosX != posX && oldPosZ != posZ)
                     {
-                        if (Physics.Raycast(target, Vector3.down, out hit, maxHeight + 2, 1 << STATICS))
+                        if (
+                            Physics.Raycast(
+                                target,
+                                Vector3.down,
+                                out hit,
+                                maxHeight + 2,
+                                1 << STATICS
+                            )
+                        )
                         {
                             //ProbeTextureColors(x, (int)(hit.point.GlobalY() + 10),z);
 
@@ -319,11 +366,17 @@ namespace NOBlackBox
         static void SaveCustomHeightmapListXML()
         {
             XDocument doc = new XDocument(
-                new XElement("Resources",
-                    new XElement("CustomHeightmapList",
-                        new XElement("CustomHeightmap",
-                        new XAttribute("Layer", "Nuclear Option"),
-                        new XAttribute("Id", $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"),
+                new XElement(
+                    "Resources",
+                    new XElement(
+                        "CustomHeightmapList",
+                        new XElement(
+                            "CustomHeightmap",
+                            new XAttribute("Layer", "Nuclear Option"),
+                            new XAttribute(
+                                "Id",
+                                $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"
+                            ),
                             new XElement("File", Path.GetFileName(heightmapFileName)),
                             new XElement("BigEndian", "0"),
                             new XElement("Width", textureSize.ToString()),
@@ -331,18 +384,26 @@ namespace NOBlackBox
                             new XElement("AltitudeFactor", "1.0"),
                             new XElement("AltitudeOffset", "0"),
                             new XElement("Projection", "Quad"),
-                            new XElement("BottomLeft",
-                            new XElement("Longitude", -terrainHalfInDegrees),
-                            new XElement("Latitude", -terrainHalfInDegrees)),
-                            new XElement("BottomRight",
-                            new XElement("Longitude", terrainHalfInDegrees),
-                            new XElement("Latitude", -terrainHalfInDegrees)),
-                            new XElement("TopRight",
-                            new XElement("Longitude", terrainHalfInDegrees),
-                            new XElement("Latitude", terrainHalfInDegrees)),
-                            new XElement("TopLeft",
-                            new XElement("Longitude", -terrainHalfInDegrees),
-                            new XElement("Latitude", terrainHalfInDegrees))
+                            new XElement(
+                                "BottomLeft",
+                                new XElement("Longitude", -terrainHalfInDegrees),
+                                new XElement("Latitude", -terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "BottomRight",
+                                new XElement("Longitude", terrainHalfInDegrees),
+                                new XElement("Latitude", -terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "TopRight",
+                                new XElement("Longitude", terrainHalfInDegrees),
+                                new XElement("Latitude", terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "TopLeft",
+                                new XElement("Longitude", -terrainHalfInDegrees),
+                                new XElement("Latitude", terrainHalfInDegrees)
+                            )
                         )
                     )
                 )
@@ -360,9 +421,13 @@ namespace NOBlackBox
             {
                 doc = XDocument.Load(CombinedCustomHeightMapListXMLPath);
 
-                XElement newHeightmap = new XElement("CustomHeightmap",
+                XElement newHeightmap = new XElement(
+                    "CustomHeightmap",
                     new XAttribute("Layer", "Nuclear Option"),
-                    new XAttribute("Id", $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"),
+                    new XAttribute(
+                        "Id",
+                        $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"
+                    ),
                     new XElement("File", Path.GetFileName(heightmapFileName)),
                     new XElement("BigEndian", "0"),
                     new XElement("Width", textureSize.ToString()),
@@ -370,48 +435,67 @@ namespace NOBlackBox
                     new XElement("AltitudeFactor", "1.0"),
                     new XElement("AltitudeOffset", "0"),
                     new XElement("Projection", "Quad"),
-                    new XElement("BottomLeft",
-                    new XElement("Longitude", -terrainHalfInDegrees),
-                    new XElement("Latitude", -terrainHalfInDegrees)),
-                    new XElement("BottomRight",
-                    new XElement("Longitude", terrainHalfInDegrees),
-                    new XElement("Latitude", -terrainHalfInDegrees)),
-                    new XElement("TopRight",
-                    new XElement("Longitude", terrainHalfInDegrees),
-                    new XElement("Latitude", terrainHalfInDegrees)),
-                    new XElement("TopLeft",
-                    new XElement("Longitude", -terrainHalfInDegrees),
-                    new XElement("Latitude", terrainHalfInDegrees))
+                    new XElement(
+                        "BottomLeft",
+                        new XElement("Longitude", -terrainHalfInDegrees),
+                        new XElement("Latitude", -terrainHalfInDegrees)
+                    ),
+                    new XElement(
+                        "BottomRight",
+                        new XElement("Longitude", terrainHalfInDegrees),
+                        new XElement("Latitude", -terrainHalfInDegrees)
+                    ),
+                    new XElement(
+                        "TopRight",
+                        new XElement("Longitude", terrainHalfInDegrees),
+                        new XElement("Latitude", terrainHalfInDegrees)
+                    ),
+                    new XElement(
+                        "TopLeft",
+                        new XElement("Longitude", -terrainHalfInDegrees),
+                        new XElement("Latitude", terrainHalfInDegrees)
+                    )
                 );
 
                 XElement root = doc.Element("Resources");
                 XElement heightmapList = root.Element("CustomHeightmapList");
 
-                XElement existing = heightmapList.Elements("CustomHeightmap").FirstOrDefault(e => (string)e.Element("File") == heightmapFileName);
+                XElement existing = heightmapList
+                    .Elements("CustomHeightmap")
+                    .FirstOrDefault(e => (string)e.Element("File") == heightmapFileName);
 
                 if (existing != null)
                 {
                     existing.ReplaceWith(newHeightmap);
-                    Plugin.Logger?.LogDebug($"Updating {heightmapFileName} in {CombinedCustomHeightMapListXMLPath}...");
+                    Plugin.Logger?.LogDebug(
+                        $"Updating {heightmapFileName} in {CombinedCustomHeightMapListXMLPath}..."
+                    );
                 }
                 else
                 {
                     heightmapList.Add(newHeightmap);
-                    Plugin.Logger?.LogDebug($"Adding {heightmapFileName} to {CombinedCustomHeightMapListXMLPath}...");
+                    Plugin.Logger?.LogDebug(
+                        $"Adding {heightmapFileName} to {CombinedCustomHeightMapListXMLPath}..."
+                    );
                 }
 
                 doc.Save(CombinedCustomHeightMapListXMLPath);
                 Plugin.Logger?.LogDebug($"Saved {CombinedCustomHeightMapListXMLPath} to disk.");
-
             }
             catch
             {
                 doc = new XDocument(
-                    new XElement("Resources",
-                        new XElement("CustomHeightmapList",
-                            new XElement("CustomHeightmap",
-                            new XAttribute("Layer", "Nuclear Option"),
-                            new XAttribute("Id", $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"),
+                    new XElement(
+                        "Resources",
+                        new XElement(
+                            "CustomHeightmapList",
+                            new XElement(
+                                "CustomHeightmap",
+                                new XAttribute("Layer", "Nuclear Option"),
+                                new XAttribute(
+                                    "Id",
+                                    $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"
+                                ),
                                 new XElement("File", Path.GetFileName(heightmapFileName)),
                                 new XElement("BigEndian", "0"),
                                 new XElement("Width", textureSize.ToString()),
@@ -419,23 +503,33 @@ namespace NOBlackBox
                                 new XElement("AltitudeFactor", "1.0"),
                                 new XElement("AltitudeOffset", "0"),
                                 new XElement("Projection", "Quad"),
-                                new XElement("BottomLeft",
-                                new XElement("Longitude", -terrainHalfInDegrees),
-                                new XElement("Latitude", -terrainHalfInDegrees)),
-                                new XElement("BottomRight",
-                                new XElement("Longitude", terrainHalfInDegrees),
-                                new XElement("Latitude", -terrainHalfInDegrees)),
-                                new XElement("TopRight",
-                                new XElement("Longitude", terrainHalfInDegrees),
-                                new XElement("Latitude", terrainHalfInDegrees)),
-                                new XElement("TopLeft",
-                                new XElement("Longitude", -terrainHalfInDegrees),
-                                new XElement("Latitude", terrainHalfInDegrees))
+                                new XElement(
+                                    "BottomLeft",
+                                    new XElement("Longitude", -terrainHalfInDegrees),
+                                    new XElement("Latitude", -terrainHalfInDegrees)
+                                ),
+                                new XElement(
+                                    "BottomRight",
+                                    new XElement("Longitude", terrainHalfInDegrees),
+                                    new XElement("Latitude", -terrainHalfInDegrees)
+                                ),
+                                new XElement(
+                                    "TopRight",
+                                    new XElement("Longitude", terrainHalfInDegrees),
+                                    new XElement("Latitude", terrainHalfInDegrees)
+                                ),
+                                new XElement(
+                                    "TopLeft",
+                                    new XElement("Longitude", -terrainHalfInDegrees),
+                                    new XElement("Latitude", terrainHalfInDegrees)
+                                )
                             )
                         )
                     )
                 );
-                Plugin.Logger?.LogDebug($"Saving custom tacview custom XML to {CombinedCustomHeightMapListXMLPath}");
+                Plugin.Logger?.LogDebug(
+                    $"Saving custom tacview custom XML to {CombinedCustomHeightMapListXMLPath}"
+                );
                 doc.Save(CombinedCustomHeightMapListXMLPath);
             }
         }
@@ -443,24 +537,38 @@ namespace NOBlackBox
         static void SaveCustomTextureListXML()
         {
             XDocument doc = new XDocument(
-                new XElement("Resources",
-                    new XElement("CustomTextureList",
-                        new XElement("CustomTexture",
-                        new XAttribute("Layer", "Nuclear Option"),
-                        new XAttribute("Id", $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"),
+                new XElement(
+                    "Resources",
+                    new XElement(
+                        "CustomTextureList",
+                        new XElement(
+                            "CustomTexture",
+                            new XAttribute("Layer", "Nuclear Option"),
+                            new XAttribute(
+                                "Id",
+                                $"NuclearOption.{MapSettingsManager.i.MapLoader.CurrentMap.Path}"
+                            ),
                             new XElement("File", Path.GetFileName(textureFileName)),
-                            new XElement("BottomLeft",
-                            new XElement("Longitude", -terrainHalfInDegrees),
-                            new XElement("Latitude", -terrainHalfInDegrees)),
-                            new XElement("BottomRight",
-                            new XElement("Longitude", terrainHalfInDegrees),
-                            new XElement("Latitude", -terrainHalfInDegrees)),
-                            new XElement("TopRight",
-                            new XElement("Longitude", terrainHalfInDegrees),
-                            new XElement("Latitude", terrainHalfInDegrees)),
-                            new XElement("TopLeft",
-                            new XElement("Longitude", -terrainHalfInDegrees),
-                            new XElement("Latitude", terrainHalfInDegrees))
+                            new XElement(
+                                "BottomLeft",
+                                new XElement("Longitude", -terrainHalfInDegrees),
+                                new XElement("Latitude", -terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "BottomRight",
+                                new XElement("Longitude", terrainHalfInDegrees),
+                                new XElement("Latitude", -terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "TopRight",
+                                new XElement("Longitude", terrainHalfInDegrees),
+                                new XElement("Latitude", terrainHalfInDegrees)
+                            ),
+                            new XElement(
+                                "TopLeft",
+                                new XElement("Longitude", -terrainHalfInDegrees),
+                                new XElement("Latitude", terrainHalfInDegrees)
+                            )
                         )
                     )
                 )
@@ -469,6 +577,5 @@ namespace NOBlackBox
             Plugin.Logger?.LogDebug($"Saving custom tacview custom XML to {XMLPath}");
             doc.Save(XMLPath);
         }
-
     }
 }

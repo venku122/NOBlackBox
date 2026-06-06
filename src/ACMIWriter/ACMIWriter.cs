@@ -1,11 +1,11 @@
-using BepInEx.Logging;
-using NuclearOption.SavedMission;
-using NuclearOption.SceneLoading;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using BepInEx.Logging;
+using NuclearOption.SavedMission;
+using NuclearOption.SceneLoading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,6 +19,7 @@ namespace NOBlackBox
         public static DateTime lastFlushTime;
         internal string filename;
         internal MapKey currentMapKey;
+
         internal ACMIWriter(DateTime reference)
         {
             string dir = Configuration.OutputPath;
@@ -28,7 +29,11 @@ namespace NOBlackBox
             }
 
             string basename = Path.Combine(dir, DateTime.Now.ToString("s").Replace(":", "-"));
-            basename += "_" + MissionManager.CurrentMission.Name + "_" + MapSettingsManager.i.MapLoader.CurrentMap.Path;
+            basename +=
+                "_"
+                + MissionManager.CurrentMission.Name
+                + "_"
+                + MapSettingsManager.i.MapLoader.CurrentMap.Path;
             filename = basename + ".acmi";
             int postfix = 0;
             while (File.Exists(filename))
@@ -50,12 +55,12 @@ namespace NOBlackBox
                 { "DataRecorder", $"NOBlackBox 0.3.8.2" },
                 { "Author", Plugin.localPlayer?.name.Replace(",", "\\,") ?? "Server" },
                 { "RecordingTime", DateTime.Now.ToString("s") + "Z" },
-				{ "MapId", $"NuclearOption.{currentMapKey.Path}"},
+                { "MapId", $"NuclearOption.{currentMapKey.Path}" },
             };
 
             Mission mission = MissionManager.CurrentMission;
             initProps.Add("Title", mission.Name.Replace(",", "\\,"));
-            
+
             /*
             if (mission.missionSettings.description != null)
             {
@@ -95,7 +100,6 @@ namespace NOBlackBox
 
         internal void RemoveObject(ACMIObject_mono aObject, DateTime updateTime)
         {
-
             TimeSpan diff = updateTime - reference;
             if (diff != lastUpdate)
             {
@@ -149,7 +153,11 @@ namespace NOBlackBox
 
         private string StringifyProps(Dictionary<string, string> props)
         {
-            string[] propStrings = props.Select(x => x.Key + "=" + x.Value/*.Replace(",", "\\,")*/).ToArray();
+            string[] propStrings = props
+                .Select(x =>
+                    x.Key + "=" + x.Value /*.Replace(",", "\\,")*/
+                )
+                .ToArray();
             return string.Join(",", propStrings);
         }
 

@@ -1,8 +1,8 @@
-﻿using Mirage.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using Mirage.Serialization;
 using UnityEngine;
 using static Mirage.NetworkBehaviour;
 
@@ -42,10 +42,9 @@ namespace NOBlackBox
             base.enabled = true;
             */
         }
-        public override void Update()
-        {
 
-        }
+        public override void Update() { }
+
         public virtual void LateUpdate()
         {
             try
@@ -65,13 +64,16 @@ namespace NOBlackBox
                     {
                         Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterRemove(this);
                         this.enabled = false;
-                        Plugin.Logger?.LogDebug($"DISABLING UNIT {unitId.ToString(CultureInfo.InvariantCulture)}");
+                        Plugin.Logger?.LogDebug(
+                            $"DISABLING UNIT {unitId.ToString(CultureInfo.InvariantCulture)}"
+                        );
                         GameObject.Destroy(this);
                     }
                     //this is to stagger the Destroyed Event and the Remove call to 2 different time steps, as having them both on the same time step will confuse Tacview
                     purge = true;
                 }
-            } catch
+            }
+            catch
             {
                 GameObject.Destroy(this);
             }
@@ -79,17 +81,29 @@ namespace NOBlackBox
 
         private string UpdatePosition(Vector3 newPos, Vector3 newRot)
         {
-            string x = Mathf.Approximately(newPos.x, lastPos.x) ? "" : newPos.x.ToString(CultureInfo.InvariantCulture);
-            string y = Mathf.Approximately(newPos.y, lastPos.y) ? "" : newPos.y.ToString(CultureInfo.InvariantCulture);
-            string z = Mathf.Approximately(newPos.z, lastPos.z) ? "" : newPos.z.ToString(CultureInfo.InvariantCulture);
+            string x = Mathf.Approximately(newPos.x, lastPos.x)
+                ? ""
+                : newPos.x.ToString(CultureInfo.InvariantCulture);
+            string y = Mathf.Approximately(newPos.y, lastPos.y)
+                ? ""
+                : newPos.y.ToString(CultureInfo.InvariantCulture);
+            string z = Mathf.Approximately(newPos.z, lastPos.z)
+                ? ""
+                : newPos.z.ToString(CultureInfo.InvariantCulture);
 
             float adjusted_roll = newRot.z > 180.0f ? 360 - newRot.z : -newRot.z;
             float adjusted_pitch = newRot.x > 180.0f ? 360 - newRot.x : -newRot.x;
             float adjusted_yaw = newRot.y;
 
-            string roll = Mathf.Approximately(newRot.z, lastRot.z) ? "" : adjusted_roll.ToString(CultureInfo.InvariantCulture);
-            string pitch = Mathf.Approximately(newRot.x, lastRot.x) ? "" : adjusted_pitch.ToString(CultureInfo.InvariantCulture);
-            string yaw = Mathf.Approximately(newRot.y, lastRot.y) ? "" : adjusted_yaw.ToString(CultureInfo.InvariantCulture);
+            string roll = Mathf.Approximately(newRot.z, lastRot.z)
+                ? ""
+                : adjusted_roll.ToString(CultureInfo.InvariantCulture);
+            string pitch = Mathf.Approximately(newRot.x, lastRot.x)
+                ? ""
+                : adjusted_pitch.ToString(CultureInfo.InvariantCulture);
+            string yaw = Mathf.Approximately(newRot.y, lastRot.y)
+                ? ""
+                : adjusted_yaw.ToString(CultureInfo.InvariantCulture);
 
             (float latitude, float longitude) = Helpers.CartesianToGeodetic(newPos.x, newPos.z);
 
@@ -111,7 +125,10 @@ namespace NOBlackBox
 
             if (newPos != lastPos || newRot != lastRot)
             {
-                props.Add("T", UpdatePosition(newPos, newRot).ToString(CultureInfo.InvariantCulture));
+                props.Add(
+                    "T",
+                    UpdatePosition(newPos, newRot).ToString(CultureInfo.InvariantCulture)
+                );
 
                 lastPos = newPos;
                 lastRot = newRot;
@@ -123,23 +140,24 @@ namespace NOBlackBox
             if (unit.unitState != lastState)
             {
                 lastState = unit.unitState;
-                props.Add("Debug",lastState.ToString());
+                props.Add("Debug", lastState.ToString());
             }
         }
 
-        internal virtual void UpdateTargets()
-        {
-
-        }
-
+        internal virtual void UpdateTargets() { }
 
         internal long GetTacviewIdOfUnit(long unitId)
         {
             long id = -1;
             try
             {
-                id = Plugin.recorderMono.GetComponent<Recorder_mono>().unitObjects[unitId].GetComponent<ACMIUnit_mono>().tacviewId;
-            } catch
+                id = Plugin
+                    .recorderMono.GetComponent<Recorder_mono>()
+                    .unitObjects[unitId]
+                    .GetComponent<ACMIUnit_mono>()
+                    .tacviewId;
+            }
+            catch
             {
                 Plugin.Logger?.LogDebug($"GetTacviewIdofUnit failed to look up UNIT ID {unitId}");
                 id = -1;

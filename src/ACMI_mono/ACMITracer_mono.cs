@@ -22,10 +22,7 @@ namespace NOBlackBox
             this.bullet = bullet;
             base.unitId = (long)(Interlocked.Increment(ref BULLETID) - 1) | (1L << 33);
             base.tacviewId = base.unitId;
-            props = new Dictionary<string, string>()
-            {
-                { "Type", "Misc+Projectile+Shell" }
-            };
+            props = new Dictionary<string, string>() { { "Type", "Misc+Projectile+Shell" } };
 
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
@@ -51,7 +48,9 @@ namespace NOBlackBox
                 this.enabled = false;
                 base.enabled = false;
                 Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterRemove(this);
-                Plugin.Logger?.LogDebug($"DISABLING TRACER {unitId.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogDebug(
+                    $"DISABLING TRACER {unitId.ToString(CultureInfo.InvariantCulture)}"
+                );
                 props = [];
                 GameObject.Destroy(this);
             }
@@ -59,7 +58,6 @@ namespace NOBlackBox
 
         public void UpdatePose()
         {
-
             float fx = MathF.Round(bullet.position.x, 2);
             float fy = MathF.Round(bullet.position.y, 2);
             float fz = MathF.Round(bullet.position.z, 2);
@@ -72,14 +70,19 @@ namespace NOBlackBox
 
                 lastPos = newPos;
             }
-
         }
 
         private string UpdatePosition(Vector3 newPos)
         {
-            string x = Mathf.Approximately(newPos.x, lastPos.x) ? "" : newPos.x.ToString(CultureInfo.InvariantCulture);
-            string y = Mathf.Approximately(newPos.y, lastPos.y) ? "" : newPos.y.ToString(CultureInfo.InvariantCulture);
-            string z = Mathf.Approximately(newPos.z, lastPos.z) ? "" : newPos.z.ToString(CultureInfo.InvariantCulture);
+            string x = Mathf.Approximately(newPos.x, lastPos.x)
+                ? ""
+                : newPos.x.ToString(CultureInfo.InvariantCulture);
+            string y = Mathf.Approximately(newPos.y, lastPos.y)
+                ? ""
+                : newPos.y.ToString(CultureInfo.InvariantCulture);
+            string z = Mathf.Approximately(newPos.z, lastPos.z)
+                ? ""
+                : newPos.z.ToString(CultureInfo.InvariantCulture);
 
             (float latitude, float longitude) = Helpers.CartesianToGeodetic(newPos.x, newPos.z);
 

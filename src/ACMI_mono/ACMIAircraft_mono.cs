@@ -45,7 +45,14 @@ namespace NOBlackBox
         public virtual void Init(Aircraft aircraft)
         {
             GameManager.GetLocalAircraft(out localAircraft);
-            if(localAircraft && localAircraft.persistentID == aircraft.persistentID) { base.unit = localAircraft; } else { base.unit = aircraft; }
+            if (localAircraft && localAircraft.persistentID == aircraft.persistentID)
+            {
+                base.unit = localAircraft;
+            }
+            else
+            {
+                base.unit = aircraft;
+            }
             this.aircraft = (Aircraft)base.unit;
             base.unitId = aircraft.persistentID.Id;
             base.tacviewId = aircraft.persistentID.Id + 1;
@@ -62,19 +69,23 @@ namespace NOBlackBox
             {
                 { "Name", this.unit.definition.unitName },
                 { "Coalition", faction?.factionName ?? "Neutral" },
-                { "Color", faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red") },
-                { "Debug", lastState.ToString()},
-                { "Type", info[1]},
-                { "CallSign", $"{aircraft.definition.code} {tacviewId:X}" }
+                {
+                    "Color",
+                    faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red")
+                },
+                { "Debug", lastState.ToString() },
+                { "Type", info[1] },
+                { "CallSign", $"{aircraft.definition.code} {tacviewId:X}" },
             };
             if (aircraft.Player != null)
             {
                 //props.Add("Pilot", aircraft.Player.PlayerName);
-                props["CallSign"] = $"{aircraft.definition.code} ({aircraft.Player.PlayerName}) {tacviewId:X}";
+                props["CallSign"] =
+                    $"{aircraft.definition.code} ({aircraft.Player.PlayerName}) {tacviewId:X}";
                 if (Configuration.RecordSteamID.Value == true)
                 {
                     props.Add("Registration", aircraft.Player.SteamID.ToString());
-                } 
+                }
             }
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
@@ -84,7 +95,6 @@ namespace NOBlackBox
 
         public override void Update()
         {
-            
             base.destroyedEvent = !aircraft.IsLanded();
             if (!this.enabled || unit.disabled)
             {
@@ -113,8 +123,15 @@ namespace NOBlackBox
             {
                 if (Configuration.ResearchLoggingEnabled.Value)
                 {
-                    string targetIds = string.Join(", ", targets.Where(t => t != null).Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture)));
-                    Plugin.Logger?.LogInfo($"[R] AC {aircraft.definition.code} targets={targets.Length} ids=[{targetIds}]");
+                    string targetIds = string.Join(
+                        ", ",
+                        targets
+                            .Where(t => t != null)
+                            .Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture))
+                    );
+                    Plugin.Logger?.LogInfo(
+                        $"[R] AC {aircraft.definition.code} targets={targets.Length} ids=[{targetIds}]"
+                    );
                 }
 
                 lastTargets = targets;
@@ -126,7 +143,9 @@ namespace NOBlackBox
                 if (targets.Length > 1)
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] AC EMIT LockedTarget (targets={targets.Length})");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] AC EMIT LockedTarget (targets={targets.Length})"
+                        );
                     for (int i = 0; i < max; i++)
                     {
                         if (i == 0)
@@ -137,16 +156,25 @@ namespace NOBlackBox
                         {
                             lockedTargetString = $"LockedTarget{i:X}";
                         }
-                            props.Add(lockedTargetString, $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}");
+                        props.Add(
+                            lockedTargetString,
+                            $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}"
+                        );
                     }
                 }
                 else
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] AC SKIP LockedTarget (targets={targets.Length} <= 1)");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] AC SKIP LockedTarget (targets={targets.Length} <= 1)"
+                        );
                 }
 
-                ResearchReflectionProbe.DumpTargets(targets, aircraft.definition.code, aircraft.persistentID.Id);
+                ResearchReflectionProbe.DumpTargets(
+                    targets,
+                    aircraft.definition.code,
+                    aircraft.persistentID.Id
+                );
             }
         }
 
@@ -155,16 +183,17 @@ namespace NOBlackBox
             float avgThrust = float.NaN;
 
             int count = aircraft.engines.Count;
-            for (int i = 0; i < aircraft.engines.Count;i++)
+            for (int i = 0; i < aircraft.engines.Count; i++)
             {
                 float thrust = aircraft.engines[i].GetThrust();
                 if (thrust != 0f)
                 {
                     avgThrust = avgThrust + thrust;
-                } else
+                }
+                else
                 {
                     count = count - 1;
-                } 
+                }
             }
             if (avgThrust != 0f)
             {
@@ -178,11 +207,16 @@ namespace NOBlackBox
             if (aircraft.speed != lastTAS && Configuration.RecordSpeed.Value == true)
             {
                 props.Add("TAS", aircraft.speed.ToString("0.##", CultureInfo.InvariantCulture));
-                props.Add("Mach", (aircraft.speed / 340).ToString("0.###", CultureInfo.InvariantCulture));
+                props.Add(
+                    "Mach",
+                    (aircraft.speed / 340).ToString("0.###", CultureInfo.InvariantCulture)
+                );
                 lastTAS = aircraft.speed;
             }
 
-            Vector3 vector3 = aircraft.cockpit.transform.InverseTransformDirection(aircraft.cockpit.rb.velocity);
+            Vector3 vector3 = aircraft.cockpit.transform.InverseTransformDirection(
+                aircraft.cockpit.rb.velocity
+            );
             float num = MathF.Round(Mathf.Atan2(vector3.y, vector3.z) * -57.29578f, 2);
 
             if (num != lastAOA && Configuration.RecordAOA.Value == true)
@@ -193,7 +227,10 @@ namespace NOBlackBox
 
             if (aircraft.radarAlt != lastAGL && Configuration.RecordAGL.Value == true)
             {
-                props.Add("AGL", Mathf.Max(0, aircraft.radarAlt).ToString("0.##", CultureInfo.InvariantCulture));
+                props.Add(
+                    "AGL",
+                    Mathf.Max(0, aircraft.radarAlt).ToString("0.##", CultureInfo.InvariantCulture)
+                );
                 lastAGL = aircraft.radarAlt;
             }
 
@@ -209,9 +246,13 @@ namespace NOBlackBox
                 lastRadar = aircraft.radar;
             }
 
-            if (localAircraft && localAircraft.persistentID == aircraft.persistentID && CameraStateManager.cameraMode == CameraMode.cockpit && Configuration.RecordPilotHead.Value == true)
+            if (
+                localAircraft
+                && localAircraft.persistentID == aircraft.persistentID
+                && CameraStateManager.cameraMode == CameraMode.cockpit
+                && Configuration.RecordPilotHead.Value == true
+            )
             {
-                
                 Camera camera = CameraStateManager.i.mainCamera;
 
                 Vector3 rot = camera.transform.localEulerAngles;
@@ -227,13 +268,19 @@ namespace NOBlackBox
                     if (!Mathf.Approximately(newRot.x, lastHead.x))
                     {
                         float adjusted_pitch = newRot.x > 180.0f ? 360 - newRot.x : -newRot.x;
-                        props.Add("PilotHeadPitch", adjusted_pitch.ToString("0.##", CultureInfo.InvariantCulture));
+                        props.Add(
+                            "PilotHeadPitch",
+                            adjusted_pitch.ToString("0.##", CultureInfo.InvariantCulture)
+                        );
                     }
 
                     if (!Mathf.Approximately(newRot.y, lastHead.y))
                     {
                         float adjusted_yaw = newRot.y;
-                        props.Add("PilotHeadYaw", adjusted_yaw.ToString("0.##", CultureInfo.InvariantCulture));
+                        props.Add(
+                            "PilotHeadYaw",
+                            adjusted_yaw.ToString("0.##", CultureInfo.InvariantCulture)
+                        );
                     }
 
                     lastHead = newRot;
@@ -242,31 +289,45 @@ namespace NOBlackBox
 
             if (Configuration.RecordExtraTelemetry.Value == true)
             {
-               
                 if (lastThrottle != aircraft.GetInputs().throttle)
                 {
-                    props.Add("Throttle", aircraft.GetInputs().throttle.ToString("0.##", CultureInfo.InvariantCulture));
+                    props.Add(
+                        "Throttle",
+                        aircraft.GetInputs().throttle.ToString("0.##", CultureInfo.InvariantCulture)
+                    );
                     lastThrottle = aircraft.GetInputs().throttle;
                 }
                 if (lastRoll != aircraft.GetInputs().roll)
                 {
-                    props.Add("RollControlInput", aircraft.GetInputs().roll.ToString("0.##", CultureInfo.InvariantCulture));
+                    props.Add(
+                        "RollControlInput",
+                        aircraft.GetInputs().roll.ToString("0.##", CultureInfo.InvariantCulture)
+                    );
                     lastRoll = aircraft.GetInputs().roll;
                 }
                 if (lastPitch != aircraft.GetInputs().pitch)
                 {
-                    props.Add("PitchControlInput", aircraft.GetInputs().pitch.ToString("0.##", CultureInfo.InvariantCulture));
+                    props.Add(
+                        "PitchControlInput",
+                        aircraft.GetInputs().pitch.ToString("0.##", CultureInfo.InvariantCulture)
+                    );
                     lastPitch = aircraft.GetInputs().pitch;
                 }
                 if (lastYaw != aircraft.GetInputs().yaw)
                 {
-                    props.Add("YawControlInput", aircraft.GetInputs().yaw.ToString("0.##", CultureInfo.InvariantCulture));
+                    props.Add(
+                        "YawControlInput",
+                        aircraft.GetInputs().yaw.ToString("0.##", CultureInfo.InvariantCulture)
+                    );
                     lastYaw = aircraft.GetInputs().yaw;
                 }
                 if (lastThrust != getAvgThrust())
                 {
                     avgThrust = getAvgThrust();
-                    props.Add("EngineRPM", avgThrust.ToString("0.##", CultureInfo.InvariantCulture));
+                    props.Add(
+                        "EngineRPM",
+                        avgThrust.ToString("0.##", CultureInfo.InvariantCulture)
+                    );
                     lastThrust = avgThrust;
                 }
             }

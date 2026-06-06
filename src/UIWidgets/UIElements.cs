@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 
-
 namespace NOBlackBox
 {
     internal class UIElements : MonoBehaviour
@@ -9,38 +8,51 @@ namespace NOBlackBox
         public double countDown;
         internal float timer;
         private double secondsSinceLastUpdate;
-        void Awake()
-        {
-        }
+
+        void Awake() { }
+
         void Update()
         {
             secondsSinceLastUpdate = (DateTime.Now - ACMIWriter.lastFlushTime).TotalSeconds;
             countDown = Configuration.AutoSaveInterval - secondsSinceLastUpdate;
         }
+
         void OnGUI()
         {
             GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
             fontSize.fontSize = 24;
-            fontSize.normal.textColor = new Color(  Configuration.TextColorR.Value,
-                                                    Configuration.TextColorG.Value,
-                                                    Configuration.TextColorB.Value,
-                                                    Configuration.TextColorA.Value);
+            fontSize.normal.textColor = new Color(
+                Configuration.TextColorR.Value,
+                Configuration.TextColorG.Value,
+                Configuration.TextColorB.Value,
+                Configuration.TextColorA.Value
+            );
 
             if (Plugin.isRecording && Configuration.EnableAutoSaveCountDown.Value)
             {
-                GUI.Label(new Rect((Configuration.AutoSaveCountDownX.Value * Plugin.recordedScreenWidth),
-                                   (Configuration.AutoSaveCountDownY.Value * Plugin.recordedScreenHeight),
-                                   400,
-                                   50),
-                                   $"Next AutoSave: {countDown:N1} sec", fontSize);
+                GUI.Label(
+                    new Rect(
+                        (Configuration.AutoSaveCountDownX.Value * Plugin.recordedScreenWidth),
+                        (Configuration.AutoSaveCountDownY.Value * Plugin.recordedScreenHeight),
+                        400,
+                        50
+                    ),
+                    $"Next AutoSave: {countDown:N1} sec",
+                    fontSize
+                );
             }
             if (Configuration.EnableRecordingIndicator.Value)
             {
-                GUI.Label(new Rect((Configuration.RecordingIndicatorX.Value * Plugin.recordedScreenWidth),
-                                    (Configuration.RecordingIndicatorY.Value * Plugin.recordedScreenHeight),
-                                    400,
-                                    50),
-                                    "REC", fontSize);
+                GUI.Label(
+                    new Rect(
+                        (Configuration.RecordingIndicatorX.Value * Plugin.recordedScreenWidth),
+                        (Configuration.RecordingIndicatorY.Value * Plugin.recordedScreenHeight),
+                        400,
+                        50
+                    ),
+                    "REC",
+                    fontSize
+                );
             }
         }
     }

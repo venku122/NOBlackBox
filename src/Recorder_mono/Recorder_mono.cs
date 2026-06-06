@@ -11,8 +11,14 @@ namespace NOBlackBox
 {
     internal class Recorder_mono : MonoBehaviour
     {
-        private static readonly FieldInfo bulletSim = typeof(Gun).GetField("bulletSim", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly FieldInfo bullets = typeof(BulletSim).GetField("bullets", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo bulletSim = typeof(Gun).GetField(
+            "bulletSim",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
+        private static readonly FieldInfo bullets = typeof(BulletSim).GetField(
+            "bullets",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
 
         private Dictionary<Shockwave, GameObject> waves = [];
         Shockwave[] shockwaves = [];
@@ -26,7 +32,6 @@ namespace NOBlackBox
 
         internal Dictionary<long, GameObject> unitObjects = [];
 
-
         private Dictionary<BulletSim.Bullet, GameObject> tracers = [];
 
         private Unit[] units = [];
@@ -35,7 +40,7 @@ namespace NOBlackBox
         private HashSet<long> fieldsDumped = new();
         private bool processBulletSims = false;
         private bool processShockWaves = false;
-        
+
         public void invokeWriterUpdate(ACMIObject_mono obj)
         {
             writer.UpdateObject(obj, curTime);
@@ -61,7 +66,9 @@ namespace NOBlackBox
             Plugin.Logger?.LogDebug("USING MONO RECORDER");
             if (Configuration.UseMissionTime?.Value == true)
             {
-                startDate = DateTime.Today + TimeSpan.FromHours(MissionManager.CurrentMission.environment.timeOfDay);
+                startDate =
+                    DateTime.Today
+                    + TimeSpan.FromHours(MissionManager.CurrentMission.environment.timeOfDay);
                 Plugin.Logger?.LogDebug("USING MISSION CLOCK");
             }
             else
@@ -78,10 +85,12 @@ namespace NOBlackBox
             if (Configuration.ResearchLoggingEnabled.Value)
             {
                 string mission = MissionManager.CurrentMission?.Name ?? "unknown";
-                Plugin.Logger?.LogInfo($"[R] Recorder_Awake mission=\"{mission}\" AutoStartRecording={Configuration.AutoStartRecording.Value}");
+                Plugin.Logger?.LogInfo(
+                    $"[R] Recorder_Awake mission=\"{mission}\" AutoStartRecording={Configuration.AutoStartRecording.Value}"
+                );
             }
-
         }
+
         void Update()
         {
             curTime += TimeSpan.FromSeconds(Time.deltaTime);
@@ -105,7 +114,6 @@ namespace NOBlackBox
                     }
                     if (!unitObjects.TryGetValue(unit.persistentID.Id, out GameObject acmi))
                     {
-
                         switch (unit)
                         {
                             case Aircraft aircraft:
@@ -124,9 +132,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIAircraft_mono>();
                                 acmi.GetComponent<ACMIAircraft_mono>().Init(aircraft);
                                 acmi.GetComponent<ACMIAircraft_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -135,9 +145,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIMissile_mono>();
                                 acmi.GetComponent<ACMIMissile_mono>().Init(missile);
                                 acmi.GetComponent<ACMIMissile_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -146,9 +158,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIGroundVehicle_mono>();
                                 acmi.GetComponent<ACMIGroundVehicle_mono>().Init(vehicle);
                                 acmi.GetComponent<ACMIGroundVehicle_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -157,9 +171,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIShip_mono>();
                                 acmi.GetComponent<ACMIShip_mono>().Init(ship);
                                 acmi.GetComponent<ACMIShip_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -170,11 +186,12 @@ namespace NOBlackBox
                                     acmi.AddComponent<ACMIPilotDismounted_mono>();
                                     acmi.GetComponent<ACMIPilotDismounted_mono>().Init(pilot);
                                     acmi.GetComponent<ACMIPilotDismounted_mono>().enabled = true;
-                                    Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                        $"{unit.definition.unitName}," +
-                                        $"{unit.definition.code}");
+                                    Plugin.Logger?.LogDebug(
+                                        $"RECORDED UNIT,{unit.definition.name},"
+                                            + $"{unit.definition.unitName},"
+                                            + $"{unit.definition.code}"
+                                    );
                                     unitObjects.Add(unit.persistentID.Id, acmi);
-    
                                 }
                                 break;
                             case Building building:
@@ -182,9 +199,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIBuilding_mono>();
                                 acmi.GetComponent<ACMIBuilding_mono>().Init(building);
                                 acmi.GetComponent<ACMIBuilding_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -193,9 +212,11 @@ namespace NOBlackBox
                                 acmi.AddComponent<ACMIScenery_mono>();
                                 acmi.GetComponent<ACMIScenery_mono>().Init(scenery);
                                 acmi.GetComponent<ACMIScenery_mono>().enabled = true;
-                                Plugin.Logger?.LogDebug($"RECORDED UNIT,{unit.definition.name}," +
-                                    $"{unit.definition.unitName}," +
-                                    $"{unit.definition.code}");
+                                Plugin.Logger?.LogDebug(
+                                    $"RECORDED UNIT,{unit.definition.name},"
+                                        + $"{unit.definition.unitName},"
+                                        + $"{unit.definition.code}"
+                                );
                                 unitObjects.Add(unit.persistentID.Id, acmi);
 
                                 break;
@@ -210,17 +231,19 @@ namespace NOBlackBox
                     ResearchReflectionProbe.DumpBuildingCounts(units);
 
                 if (Configuration.ResearchLoggingEnabled.Value)
-                    Plugin.Logger?.LogInfo($"[R] UnitDiscovery: {units.Length} units, {unitObjects.Count} tracked");
+                    Plugin.Logger?.LogInfo(
+                        $"[R] UnitDiscovery: {units.Length} units, {unitObjects.Count} tracked"
+                    );
             }
             if (processBulletSims)
             {
                 foreach (var bulletSim in bulletSims)
                 {
-                    List<BulletSim.Bullet> bullets = (List<BulletSim.Bullet>)Recorder_mono.bullets.GetValue(bulletSim);
+                    List<BulletSim.Bullet> bullets =
+                        (List<BulletSim.Bullet>)Recorder_mono.bullets.GetValue(bulletSim);
 
                     foreach (var bullet in bullets)
                     {
-
                         if (!tracers.ContainsKey(bullet))
                         {
                             GameObject tracer = new GameObject();
@@ -234,7 +257,7 @@ namespace NOBlackBox
                 processBulletSims = false;
             }
 
-            if(processShockWaves)
+            if (processShockWaves)
             {
                 foreach (Shockwave wave in shockwaves)
                 {
@@ -250,6 +273,7 @@ namespace NOBlackBox
                 }
             }
         }
+
         void LateUpdate()
         {
             unitDiscoveryTimer += Time.deltaTime;
@@ -267,13 +291,14 @@ namespace NOBlackBox
             {
                 processBulletSims = BulletSimDiscovery();
             }
-
         }
+
         void OnDisable()
         {
             writer?.Close();
             Plugin.Logger?.LogDebug("DISABLED MONO RECORDER");
         }
+
         void OnDestroy()
         {
             unitObjects = [];
@@ -298,7 +323,6 @@ namespace NOBlackBox
             //Plugin.Logger?.LogDebug($"DISCOVERED {units.Length.ToString(CultureInfo.InvariantCulture)} UNITS!");
             unitDiscoveryTimer = 0f;
             return true;
-
         }
 
         internal bool BulletSimDiscovery()
@@ -318,7 +342,6 @@ namespace NOBlackBox
                         {
                             //wtf
                         }
-
                     }
                 }
             }

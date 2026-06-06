@@ -11,7 +11,12 @@ namespace NOBlackBox
         public long unitId;
         public long tacviewId;
         internal float timer = 0f;
-        internal float fx, fy, fz, fax, fay, faz;
+        internal float fx,
+            fy,
+            fz,
+            fax,
+            fay,
+            faz;
         internal bool disabled = false;
         internal bool destroyedEvent = false;
 
@@ -19,31 +24,16 @@ namespace NOBlackBox
 
         public Dictionary<string, string> props = [];
 
-        public virtual void Init()
-        {
+        public virtual void Init() { }
 
-        }
+        public virtual void Update() { }
 
-        public virtual void Update()
-        {
+        void Awake() { }
 
-        }
+        void FixedUpdate() { }
 
-        void Awake()
-        {
+        void Reset() { }
 
-        }
-        void FixedUpdate()
-        {
-
-        }
-        void Reset()
-        {
-
-        }
-        void OnDisable()
-        {
-
-        }
+        void OnDisable() { }
     }
 }

@@ -19,7 +19,11 @@ namespace NOBlackBox
         {
             if (string.IsNullOrEmpty(dumpDir))
             {
-                string baseDir = Path.Combine(BepInEx.Paths.PluginPath, "NOBlackBox", "research-dumps");
+                string baseDir = Path.Combine(
+                    BepInEx.Paths.PluginPath,
+                    "NOBlackBox",
+                    "research-dumps"
+                );
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 dumpDir = Path.Combine(baseDir, $"{timestamp}_session-{sessionRun++}");
                 Directory.CreateDirectory(dumpDir);
@@ -59,41 +63,76 @@ namespace NOBlackBox
                 if (header)
                     w.WriteLine("unitId,unitName,code,type,fieldName,fieldType,fieldValue");
 
-                DumpFieldsTo(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code, unit.GetType().Name);
+                DumpFieldsTo(
+                    w,
+                    unit,
+                    unit.persistentID.Id,
+                    unit.definition.unitName,
+                    unit.definition.code,
+                    unit.GetType().Name
+                );
             }
         }
 
-        private static void DumpFieldsTo(StreamWriter w, object obj, long unitId, string unitName, string code, string typeName)
+        private static void DumpFieldsTo(
+            StreamWriter w,
+            object obj,
+            long unitId,
+            string unitName,
+            string code,
+            string typeName
+        )
         {
             var seen = new HashSet<string>();
             Type t = obj.GetType();
 
             while (t != null && t != typeof(object))
             {
-                foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (
+                    FieldInfo f in t.GetFields(
+                        BindingFlags.Public
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Instance
+                            | BindingFlags.DeclaredOnly
+                    )
+                )
                 {
-                    if (seen.Contains(f.Name)) continue;
+                    if (seen.Contains(f.Name))
+                        continue;
                     seen.Add(f.Name);
 
                     try
                     {
                         object val = f.GetValue(obj);
                         string valStr = FormatValue(val);
-                        w.WriteLine($"{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}");
+                        w.WriteLine(
+                            $"{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}"
+                        );
                     }
                     catch { }
                 }
-                foreach (PropertyInfo p in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (
+                    PropertyInfo p in t.GetProperties(
+                        BindingFlags.Public
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Instance
+                            | BindingFlags.DeclaredOnly
+                    )
+                )
                 {
-                    if (seen.Contains(p.Name)) continue;
+                    if (seen.Contains(p.Name))
+                        continue;
                     seen.Add(p.Name);
 
                     try
                     {
-                        if (p.GetIndexParameters().Length > 0) continue;
+                        if (p.GetIndexParameters().Length > 0)
+                            continue;
                         object val = p.GetValue(obj);
                         string valStr = FormatValue(val);
-                        w.WriteLine($"{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}");
+                        w.WriteLine(
+                            $"{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}"
+                        );
                     }
                     catch { }
                 }
@@ -103,18 +142,30 @@ namespace NOBlackBox
 
         private static string FormatValue(object val)
         {
-            if (val == null) return "null";
-            if (val is string s) return s;
-            if (val is bool b) return b ? "1" : "0";
-            if (val is float f) return f.ToString("0.##", CultureInfo.InvariantCulture);
-            if (val is int i) return i.ToString(CultureInfo.InvariantCulture);
-            if (val is long l) return l.ToString(CultureInfo.InvariantCulture);
-            if (val is Vector3 v3) return $"({v3.x:F2},{v3.y:F2},{v3.z:F2})";
-            if (val is Vector2 v2) return $"({v2.x:F2},{v2.y:F2})";
-            if (val is Quaternion q) return $"({q.x:F2},{q.y:F2},{q.z:F2},{q.w:F2})";
-            if (val is Enum e) return e.ToString();
-            if (val is Unit u) return $"{u.definition.unitName}({u.persistentID.Id})";
-            if (val is UnityEngine.Object uo) return uo.name ?? uo.GetType().Name;
+            if (val == null)
+                return "null";
+            if (val is string s)
+                return s;
+            if (val is bool b)
+                return b ? "1" : "0";
+            if (val is float f)
+                return f.ToString("0.##", CultureInfo.InvariantCulture);
+            if (val is int i)
+                return i.ToString(CultureInfo.InvariantCulture);
+            if (val is long l)
+                return l.ToString(CultureInfo.InvariantCulture);
+            if (val is Vector3 v3)
+                return $"({v3.x:F2},{v3.y:F2},{v3.z:F2})";
+            if (val is Vector2 v2)
+                return $"({v2.x:F2},{v2.y:F2})";
+            if (val is Quaternion q)
+                return $"({q.x:F2},{q.y:F2},{q.z:F2},{q.w:F2})";
+            if (val is Enum e)
+                return e.ToString();
+            if (val is Unit u)
+                return $"{u.definition.unitName}({u.persistentID.Id})";
+            if (val is UnityEngine.Object uo)
+                return uo.name ?? uo.GetType().Name;
             return val.ToString() ?? val.GetType().Name;
         }
 
@@ -130,12 +181,17 @@ namespace NOBlackBox
             using (var w = File.AppendText(path))
             {
                 if (header)
-                    w.WriteLine("time,targetCount,sourceUnitId,sourceUnitName,targetId,targetName,targetCode");
+                    w.WriteLine(
+                        "time,targetCount,sourceUnitId,sourceUnitName,targetId,targetName,targetCode"
+                    );
 
                 foreach (Unit t in targets)
                 {
-                    if (t == null) continue;
-                    w.WriteLine($"{Time.time:F2},{targets.Length},{sourceUnitId},{EscapeCsv(sourceUnitName)},{t.persistentID.Id},{EscapeCsv(t.definition.unitName)},{t.definition.code}");
+                    if (t == null)
+                        continue;
+                    w.WriteLine(
+                        $"{Time.time:F2},{targets.Length},{sourceUnitId},{EscapeCsv(sourceUnitName)},{t.persistentID.Id},{EscapeCsv(t.definition.unitName)},{t.definition.code}"
+                    );
                 }
             }
         }
@@ -156,11 +212,15 @@ namespace NOBlackBox
 
             foreach (Unit u in allUnits)
             {
-                if (u is Building) buildingCount++;
-                else if (u is Scenery) sceneryCount++;
-                else otherCount++;
+                if (u is Building)
+                    buildingCount++;
+                else if (u is Scenery)
+                    sceneryCount++;
+                else
+                    otherCount++;
 
-                if (u.networked) networkedCount++;
+                if (u.networked)
+                    networkedCount++;
             }
 
             using (var w = File.AppendText(path))
@@ -169,12 +229,37 @@ namespace NOBlackBox
                     w.WriteLine("time,totalUnits,buildings,scenery,other,networked,nonNetworked");
 
                 int nonNetworked = allUnits.Length - networkedCount;
-                w.WriteLine($"{Time.time:F2},{allUnits.Length},{buildingCount},{sceneryCount},{otherCount},{networkedCount},{nonNetworked}");
+                w.WriteLine(
+                    $"{Time.time:F2},{allUnits.Length},{buildingCount},{sceneryCount},{otherCount},{networkedCount},{nonNetworked}"
+                );
             }
         }
 
-        private static readonly string[] ewKeywords = new[] { "jam", "ecm", "ew", "noise", "rwr", "chaff", "flar", "irJam", "countermeasure", "cm" };
-        private static readonly string[] detectionKeywords = new[] { "detect", "datalink", "sensor", "trackedBy", "radarContact", "spot", "lock", "spotted", "aware" };
+        private static readonly string[] ewKeywords = new[]
+        {
+            "jam",
+            "ecm",
+            "ew",
+            "noise",
+            "rwr",
+            "chaff",
+            "flar",
+            "irJam",
+            "countermeasure",
+            "cm",
+        };
+        private static readonly string[] detectionKeywords = new[]
+        {
+            "detect",
+            "datalink",
+            "sensor",
+            "trackedBy",
+            "radarContact",
+            "spot",
+            "lock",
+            "spotted",
+            "aware",
+        };
         private static Dictionary<long, float> lastEwDump = new();
         private static Dictionary<long, float> lastDetDump = new();
 
@@ -198,8 +283,10 @@ namespace NOBlackBox
 
         public static void DumpEW(Unit unit)
         {
-            if (!Configuration.ResearchDumpEW.Value) return;
-            if (!ShouldDumpEW(unit.persistentID.Id)) return;
+            if (!Configuration.ResearchDumpEW.Value)
+                return;
+            if (!ShouldDumpEW(unit.persistentID.Id))
+                return;
 
             EnsureDumpDir();
             string path = Path.Combine(dumpDir, "ew.csv");
@@ -208,10 +295,19 @@ namespace NOBlackBox
             using (var w = File.AppendText(path))
             {
                 if (header)
-                    w.WriteLine("time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue");
+                    w.WriteLine(
+                        "time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue"
+                    );
 
-                DumpFieldsMatching(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code,
-                    unit.GetType().Name, ewKeywords);
+                DumpFieldsMatching(
+                    w,
+                    unit,
+                    unit.persistentID.Id,
+                    unit.definition.unitName,
+                    unit.definition.code,
+                    unit.GetType().Name,
+                    ewKeywords
+                );
 
                 DumpWeaponStations(w, unit, header);
             }
@@ -221,22 +317,29 @@ namespace NOBlackBox
         {
             try
             {
-                FieldInfo wsField = unit.GetType().GetField("weaponStations",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (wsField == null) return;
+                FieldInfo wsField = unit.GetType()
+                    .GetField(
+                        "weaponStations",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                    );
+                if (wsField == null)
+                    return;
 
                 object wsObj = wsField.GetValue(unit);
-                if (wsObj == null) return;
+                if (wsObj == null)
+                    return;
 
                 PropertyInfo countProp = wsObj.GetType().GetProperty("Count");
                 PropertyInfo indexer = wsObj.GetType().GetProperty("Item");
-                if (countProp == null || indexer == null) return;
+                if (countProp == null || indexer == null)
+                    return;
 
                 int count = (int)countProp.GetValue(wsObj);
                 for (int i = 0; i < count; i++)
                 {
                     object station = indexer.GetValue(wsObj, new object[] { i });
-                    if (station == null) continue;
+                    if (station == null)
+                        continue;
 
                     string prefix = $"ws[{i}].";
                     var seen = new HashSet<string>();
@@ -244,30 +347,51 @@ namespace NOBlackBox
 
                     while (t != null && t != typeof(object))
                     {
-                        foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                        foreach (
+                            FieldInfo f in t.GetFields(
+                                BindingFlags.Public
+                                    | BindingFlags.NonPublic
+                                    | BindingFlags.Instance
+                                    | BindingFlags.DeclaredOnly
+                            )
+                        )
                         {
-                            if (seen.Contains(f.Name)) continue;
+                            if (seen.Contains(f.Name))
+                                continue;
                             seen.Add(f.Name);
 
                             try
                             {
                                 object val = f.GetValue(station);
                                 string valStr = FormatValue(val);
-                                w.WriteLine($"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}");
+                                w.WriteLine(
+                                    $"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}"
+                                );
                             }
                             catch { }
                         }
-                        foreach (PropertyInfo p in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                        foreach (
+                            PropertyInfo p in t.GetProperties(
+                                BindingFlags.Public
+                                    | BindingFlags.NonPublic
+                                    | BindingFlags.Instance
+                                    | BindingFlags.DeclaredOnly
+                            )
+                        )
                         {
-                            if (seen.Contains(p.Name)) continue;
+                            if (seen.Contains(p.Name))
+                                continue;
                             seen.Add(p.Name);
 
                             try
                             {
-                                if (p.GetIndexParameters().Length > 0) continue;
+                                if (p.GetIndexParameters().Length > 0)
+                                    continue;
                                 object val = p.GetValue(station);
                                 string valStr = FormatValue(val);
-                                w.WriteLine($"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}");
+                                w.WriteLine(
+                                    $"{Time.time:F2},{unit.persistentID.Id},{EscapeCsv(unit.definition.unitName)},{unit.definition.code},{unit.GetType().Name},{prefix}{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}"
+                                );
                             }
                             catch { }
                         }
@@ -280,8 +404,10 @@ namespace NOBlackBox
 
         public static void DumpDetection(Unit unit)
         {
-            if (!Configuration.ResearchDumpDetection.Value) return;
-            if (!ShouldDumpDetection(unit.persistentID.Id)) return;
+            if (!Configuration.ResearchDumpDetection.Value)
+                return;
+            if (!ShouldDumpDetection(unit.persistentID.Id))
+                return;
 
             EnsureDumpDir();
             string path = Path.Combine(dumpDir, "detection.csv");
@@ -290,50 +416,96 @@ namespace NOBlackBox
             using (var w = File.AppendText(path))
             {
                 if (header)
-                    w.WriteLine("time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue");
+                    w.WriteLine(
+                        "time,unitId,unitName,code,typeName,fieldName,fieldType,fieldValue"
+                    );
 
-                DumpFieldsMatching(w, unit, unit.persistentID.Id, unit.definition.unitName, unit.definition.code,
-                    unit.GetType().Name, detectionKeywords);
+                DumpFieldsMatching(
+                    w,
+                    unit,
+                    unit.persistentID.Id,
+                    unit.definition.unitName,
+                    unit.definition.code,
+                    unit.GetType().Name,
+                    detectionKeywords
+                );
             }
         }
 
-        private static void DumpFieldsMatching(StreamWriter w, object obj, long unitId, string unitName, string code, string typeName, string[] keywords)
+        private static void DumpFieldsMatching(
+            StreamWriter w,
+            object obj,
+            long unitId,
+            string unitName,
+            string code,
+            string typeName,
+            string[] keywords
+        )
         {
             var seen = new HashSet<string>();
             Type t = obj.GetType();
 
             while (t != null && t != typeof(object))
             {
-                foreach (FieldInfo f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (
+                    FieldInfo f in t.GetFields(
+                        BindingFlags.Public
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Instance
+                            | BindingFlags.DeclaredOnly
+                    )
+                )
                 {
-                    if (seen.Contains(f.Name)) continue;
+                    if (seen.Contains(f.Name))
+                        continue;
                     seen.Add(f.Name);
 
-                    if (!keywords.Any(k => f.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0))
+                    if (
+                        !keywords.Any(k =>
+                            f.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    )
                         continue;
 
                     try
                     {
                         object val = f.GetValue(obj);
                         string valStr = FormatValue(val);
-                        w.WriteLine($"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}");
+                        w.WriteLine(
+                            $"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(f.Name)},{EscapeCsv(f.FieldType.Name)},{EscapeCsv(valStr)}"
+                        );
                     }
                     catch { }
                 }
-                foreach (PropertyInfo p in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                foreach (
+                    PropertyInfo p in t.GetProperties(
+                        BindingFlags.Public
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Instance
+                            | BindingFlags.DeclaredOnly
+                    )
+                )
                 {
-                    if (seen.Contains(p.Name)) continue;
+                    if (seen.Contains(p.Name))
+                        continue;
                     seen.Add(p.Name);
 
-                    if (!keywords.Any(k => p.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0))
+                    if (
+                        !keywords.Any(k =>
+                            p.Name.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    )
                         continue;
 
                     try
                     {
-                        if (p.GetIndexParameters().Length > 0) continue;
+                        if (p.GetIndexParameters().Length > 0)
+                            continue;
                         object val = p.GetValue(obj);
                         string valStr = FormatValue(val);
-                        w.WriteLine($"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}");
+                        w.WriteLine(
+                            $"{Time.time:F2},{unitId},{EscapeCsv(unitName)},{EscapeCsv(code)},{EscapeCsv(typeName)},{EscapeCsv(p.Name)},{EscapeCsv(p.PropertyType.Name)},{EscapeCsv(valStr)}"
+                        );
                     }
                     catch { }
                 }
@@ -343,7 +515,8 @@ namespace NOBlackBox
 
         private static string EscapeCsv(string s)
         {
-            if (s == null) return "";
+            if (s == null)
+                return "";
             if (s.Contains(',') || s.Contains('"') || s.Contains('\n'))
                 return $"\"{s.Replace("\"", "\"\"")}\"";
             return s;

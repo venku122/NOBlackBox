@@ -1,9 +1,9 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using HarmonyLib;
 using UnityEngine;
 
 namespace NOBlackBox
@@ -50,17 +50,27 @@ namespace NOBlackBox
             int winningRange = 0;
             int.TryParse(info[2], out range1);
             int.TryParse(info[3], out range2);
-            if (range1 > range2) { winningRange = range1; } else { winningRange = range2; }
+            if (range1 > range2)
+            {
+                winningRange = range1;
+            }
+            else
+            {
+                winningRange = range2;
+            }
 
             props = new Dictionary<string, string>()
             {
                 { "Name", base.unit.definition.unitName },
                 { "Coalition", faction?.factionName ?? "Neutral" },
-                { "CallSign", $"{ship.definition.unitName} {tacviewId:X}"},
-                { "Color", faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red") },
+                { "CallSign", $"{ship.definition.unitName} {tacviewId:X}" },
+                {
+                    "Color",
+                    faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red")
+                },
                 { "Type", info[1] },
                 { "EngagementRange", winningRange.ToString(CultureInfo.InvariantCulture) },
-                { "Debug", lastState.ToString()}
+                { "Debug", lastState.ToString() },
             };
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
@@ -101,15 +111,21 @@ namespace NOBlackBox
                 {
                     //no target
                 }
-
             }
 
             if (targets.Any())
             {
                 if (Configuration.ResearchLoggingEnabled.Value)
                 {
-                    string targetIds = string.Join(", ", targets.Where(t => t != null).Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture)));
-                    Plugin.Logger?.LogInfo($"[R] SH {ship.definition.unitName} targets={targets.Length} ids=[{targetIds}]");
+                    string targetIds = string.Join(
+                        ", ",
+                        targets
+                            .Where(t => t != null)
+                            .Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture))
+                    );
+                    Plugin.Logger?.LogInfo(
+                        $"[R] SH {ship.definition.unitName} targets={targets.Length} ids=[{targetIds}]"
+                    );
                 }
 
                 if (!lastTargets.Any())
@@ -132,7 +148,9 @@ namespace NOBlackBox
                 if (targets.Length > 1)
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] SH EMIT LockedTarget (targets={targets.Length})");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] SH EMIT LockedTarget (targets={targets.Length})"
+                        );
                     for (int i = 0; i < max; i++)
                     {
                         if (i == 0)
@@ -143,16 +161,25 @@ namespace NOBlackBox
                         {
                             lockedTargetString = $"LockedTarget{i:X}";
                         }
-                        props.Add(lockedTargetString, $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}");
+                        props.Add(
+                            lockedTargetString,
+                            $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}"
+                        );
                     }
                 }
                 else
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] SH SKIP LockedTarget (targets={targets.Length} <= 1)");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] SH SKIP LockedTarget (targets={targets.Length} <= 1)"
+                        );
                 }
 
-                ResearchReflectionProbe.DumpTargets(targets, ship.definition.unitName, unit.persistentID.Id);
+                ResearchReflectionProbe.DumpTargets(
+                    targets,
+                    ship.definition.unitName,
+                    unit.persistentID.Id
+                );
             }
             targets = [];
         }

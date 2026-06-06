@@ -1,17 +1,16 @@
-﻿using Mirage.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
+using Mirage.Serialization;
 using UnityEngine.Assertions.Must;
 using UnityEngine.XR;
 
 namespace NOBlackBox
 {
-
     internal struct UnitTacviewInfo
     {
         public string prefabName;
@@ -22,7 +21,14 @@ namespace NOBlackBox
         public string tacviewXMLBase;
         public string tacviewXMLShape;
 
-        public UnitTacviewInfo(string PrefabName,string Name,string UnitName, string Code, string TacviewACMIType, string TacviewXMLBase)
+        public UnitTacviewInfo(
+            string PrefabName,
+            string Name,
+            string UnitName,
+            string Code,
+            string TacviewACMIType,
+            string TacviewXMLBase
+        )
         {
             prefabName = PrefabName;
             name = Name;
@@ -38,9 +44,13 @@ namespace NOBlackBox
             return $"{prefabName};{name};{unitName};{code};{tacviewACMIType};{tacviewXMLBase};{tacviewXMLShape}";
         }
     }
+
     internal static class EncyclopediaExporter
     {
-        private static string outputDir = Path.Combine(BepInEx.Paths.PluginPath, "NOBlackBox\\Developer\\NOBlackBox_EncyclopediaExports");
+        private static string outputDir = Path.Combine(
+            BepInEx.Paths.PluginPath,
+            "NOBlackBox\\Developer\\NOBlackBox_EncyclopediaExports"
+        );
 
         private static string KnownUnitsCSV = Path.Combine(outputDir, "KnownUnits.csv");
         private static string UnknownUnitsCSV = Path.Combine(outputDir, "UnknownUnits.csv");
@@ -61,11 +71,12 @@ namespace NOBlackBox
 
         private static string KnownUnitsXML = Path.Combine(outputDir, "NuclearOption.xml");
 
-
-        private static string unitCSVHeader = "prefabName;name;unitName;code;TacviewACMIType;TacviewXMLBase;TacviewXMLShape";
-        private static Dictionary<string, UnitTacviewInfo> knownUnits = new Dictionary<string, UnitTacviewInfo>();
-        private static Dictionary<string, UnitTacviewInfo> unknownUnits = new Dictionary<string, UnitTacviewInfo>();
-
+        private static string unitCSVHeader =
+            "prefabName;name;unitName;code;TacviewACMIType;TacviewXMLBase;TacviewXMLShape";
+        private static Dictionary<string, UnitTacviewInfo> knownUnits =
+            new Dictionary<string, UnitTacviewInfo>();
+        private static Dictionary<string, UnitTacviewInfo> unknownUnits =
+            new Dictionary<string, UnitTacviewInfo>();
 
         private static StreamWriter? output;
 
@@ -76,8 +87,18 @@ namespace NOBlackBox
             foreach (string line in lines)
             {
                 string[] splits = line.Split(';');
-                if (splits[0] == "name") { continue; }
-                UnitTacviewInfo knownUnit = new UnitTacviewInfo(splits[0], splits[1], splits[2], splits[3], splits[4], splits[5]);
+                if (splits[0] == "name")
+                {
+                    continue;
+                }
+                UnitTacviewInfo knownUnit = new UnitTacviewInfo(
+                    splits[0],
+                    splits[1],
+                    splits[2],
+                    splits[3],
+                    splits[4],
+                    splits[5]
+                );
                 Plugin.Logger?.LogDebug(knownUnit.ToString());
                 if (!knownUnits.ContainsKey(splits[0]))
                 {
@@ -90,18 +111,30 @@ namespace NOBlackBox
         {
             if (!knownUnits.ContainsKey(def.unitPrefab.name))
             {
-                UnitTacviewInfo unknownUnit = new UnitTacviewInfo(def.unitPrefab.name,def.name, def.unitName, def.code, "", "");
-                
+                UnitTacviewInfo unknownUnit = new UnitTacviewInfo(
+                    def.unitPrefab.name,
+                    def.name,
+                    def.unitName,
+                    def.code,
+                    "",
+                    ""
+                );
+
                 unknownUnits.Add(def.unitPrefab.name, unknownUnit);
                 Plugin.Logger?.LogDebug($"Found UNKNOWN Unit: {unknownUnit.ToString()}");
-            } else
-            {
-                Plugin.Logger?.LogDebug($"Found known Unit: {knownUnits[def.unitPrefab.name].ToString()}");
             }
-            
+            else
+            {
+                Plugin.Logger?.LogDebug(
+                    $"Found known Unit: {knownUnits[def.unitPrefab.name].ToString()}"
+                );
+            }
         }
 
-        private static void WriteUnitListCSV(Dictionary<string, UnitTacviewInfo> unitList, string outPath)
+        private static void WriteUnitListCSV(
+            Dictionary<string, UnitTacviewInfo> unitList,
+            string outPath
+        )
         {
             output = File.CreateText(outPath);
             output.WriteLine(unitCSVHeader);
@@ -117,27 +150,35 @@ namespace NOBlackBox
         private static void WriteUnitListXML()
         {
             XDocument doc = new XDocument();
-            XElement DefaultPropertiesCollection = new XElement("DefaultPropertiesCollection",
-                                                        new XAttribute("LoadingOrder", "1.0"));
+            XElement DefaultPropertiesCollection = new XElement(
+                "DefaultPropertiesCollection",
+                new XAttribute("LoadingOrder", "1.0")
+            );
             foreach (UnitTacviewInfo info in knownUnits.Values)
             {
                 string shortName = info.code;
-                if (shortName == "OBJ") { shortName = "BLD"; }
-                XElement DefaultProperties = new XElement("DefaultProperties",
+                if (shortName == "OBJ")
+                {
+                    shortName = "BLD";
+                }
+                XElement DefaultProperties = new XElement(
+                    "DefaultProperties",
                     new XAttribute("Id", info.prefabName),
                     new XAttribute("Base", info.tacviewXMLBase),
-                        new XElement("Criteria",
-                            new XElement("Name", info.prefabName),
-                            new XElement("Name", info.name),
-                            new XElement("Name", info.unitName)
-                        ),
-                        new XElement("Properties",
-                            new XElement("ShortName",shortName),
-                            new XElement("LongName",info.unitName),
-                            new XElement("FullName",info.unitName),
-                            new XElement("Shape",info.tacviewXMLShape)
-                        )
-                    );
+                    new XElement(
+                        "Criteria",
+                        new XElement("Name", info.prefabName),
+                        new XElement("Name", info.name),
+                        new XElement("Name", info.unitName)
+                    ),
+                    new XElement(
+                        "Properties",
+                        new XElement("ShortName", shortName),
+                        new XElement("LongName", info.unitName),
+                        new XElement("FullName", info.unitName),
+                        new XElement("Shape", info.tacviewXMLShape)
+                    )
+                );
                 shortName = string.Empty;
                 DefaultPropertiesCollection.Add(DefaultProperties);
             }
@@ -145,6 +186,7 @@ namespace NOBlackBox
             Plugin.Logger?.LogDebug($"Saving custom tacview custom XML to {KnownUnitsXML}");
             doc.Save(KnownUnitsXML);
         }
+
         public static void ExportEncyclopediaCSV()
         {
             fetchKnownUnitsCSV();
@@ -177,7 +219,7 @@ namespace NOBlackBox
                 CheckUnitInfo(def);
             }
 
-            WriteUnitListCSV(unknownUnits,UnknownUnitsCSV);
+            WriteUnitListCSV(unknownUnits, UnknownUnitsCSV);
             WriteUnitListCSV(knownUnits, KnownUnitsCSV);
             WriteUnitListXML();
         }

@@ -7,6 +7,7 @@ namespace NOBlackBox.src.ACMI_mono
     internal class ACMIScenery_mono : ACMIUnit_mono
     {
         public Scenery scenery;
+
         public virtual void Init(Scenery scenery)
         {
             base.unit = scenery;
@@ -19,11 +20,11 @@ namespace NOBlackBox.src.ACMI_mono
             props = new Dictionary<string, string>()
             {
                 { "Name", this.unit.definition.unitName },
-                { "CallSign", $"{scenery.definition.code} {tacviewId:X}"},
+                { "CallSign", $"{scenery.definition.code} {tacviewId:X}" },
                 { "Coalition", "Neutral" },
                 { "Color", "Green" },
-                { "Type","Ground+Static+Building"},
-                { "Debug", lastState.ToString()}
+                { "Type", "Ground+Static+Building" },
+                { "Debug", lastState.ToString() },
             };
             UpdatePose();
             UpdateState();

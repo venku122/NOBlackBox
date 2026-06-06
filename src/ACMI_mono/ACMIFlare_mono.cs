@@ -21,18 +21,16 @@ namespace NOBlackBox
             this.flare = source.transform.gameObject.GetComponent<IRFlare>();
             base.unitId = (long)(Interlocked.Increment(ref FLAREID) - 1) | (1L << 32);
             base.tacviewId = base.unitId;
-            props = new Dictionary<string, string>()
-            {
-                {"Type","Misc+Decoy+Flare" }
-            };
+            props = new Dictionary<string, string>() { { "Type", "Misc+Decoy+Flare" } };
             try
             {
                 Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
-            } catch
+            }
+            catch
             {
                 Destroy(this);
             }
-            
+
             props = [];
         }
 
@@ -51,7 +49,7 @@ namespace NOBlackBox
 
         public virtual void LateUpdate()
         {
-            if  (flare == null || !flare.enabled || null == flare.transform.position)
+            if (flare == null || !flare.enabled || null == flare.transform.position)
             {
                 DisableFlare();
             }
@@ -73,18 +71,24 @@ namespace NOBlackBox
 
                     lastPos = newPos;
                 }
-            } catch
+            }
+            catch
             {
                 DisableFlare();
             }
-
         }
 
         private string UpdatePosition(Vector3 newPos)
         {
-            string x = Mathf.Approximately(newPos.x, lastPos.x) ? "" : newPos.x.ToString(CultureInfo.InvariantCulture);
-            string y = Mathf.Approximately(newPos.y, lastPos.y) ? "" : newPos.y.ToString(CultureInfo.InvariantCulture);
-            string z = Mathf.Approximately(newPos.z, lastPos.z) ? "" : newPos.z.ToString(CultureInfo.InvariantCulture);
+            string x = Mathf.Approximately(newPos.x, lastPos.x)
+                ? ""
+                : newPos.x.ToString(CultureInfo.InvariantCulture);
+            string y = Mathf.Approximately(newPos.y, lastPos.y)
+                ? ""
+                : newPos.y.ToString(CultureInfo.InvariantCulture);
+            string z = Mathf.Approximately(newPos.z, lastPos.z)
+                ? ""
+                : newPos.z.ToString(CultureInfo.InvariantCulture);
 
             (float latitude, float longitude) = Helpers.CartesianToGeodetic(newPos.x, newPos.z);
 
@@ -96,7 +100,9 @@ namespace NOBlackBox
             this.enabled = false;
             base.enabled = false;
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterRemove(this);
-            Plugin.Logger?.LogDebug($"DISABLING FLARE {unitId.ToString(CultureInfo.InvariantCulture)}");
+            Plugin.Logger?.LogDebug(
+                $"DISABLING FLARE {unitId.ToString(CultureInfo.InvariantCulture)}"
+            );
             props = [];
             GameObject.Destroy(this);
         }

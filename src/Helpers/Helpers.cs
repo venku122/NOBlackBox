@@ -19,7 +19,11 @@ namespace NOBlackBox
             }
         }
 
-        public static (float, float) CartesianToGeodetic(float U /* X */, float V /* Z */)
+        public static (float, float) CartesianToGeodetic(
+            float U /* X */
+            ,
+            float V /* Z */
+        )
         {
             //Stupid simplification but it works.
             float longArc = (float)Math.PI * 6378137;

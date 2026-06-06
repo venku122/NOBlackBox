@@ -1,11 +1,11 @@
-﻿using BepInEx.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using BepInEx.Logging;
 
 namespace NOBlackBox
 {

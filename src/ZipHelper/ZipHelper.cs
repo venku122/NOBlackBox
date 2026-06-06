@@ -10,7 +10,8 @@ namespace NOBlackBox
         public static async Task<string> ZipFileAsync(
             string filePath,
             int maxRetries = 5,
-            int initialDelayMs = 16)
+            int initialDelayMs = 16
+        )
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
@@ -24,27 +25,34 @@ namespace NOBlackBox
 
             string zipPath = Path.ChangeExtension(filePath, ".zip.acmi");
 
-            using (FileStream zipStream = new FileStream(
-                zipPath,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.None,
-                bufferSize: 81920,
-                useAsync: true))
+            using (
+                FileStream zipStream = new FileStream(
+                    zipPath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None,
+                    bufferSize: 81920,
+                    useAsync: true
+                )
+            )
             using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
             {
                 ZipArchiveEntry entry = archive.CreateEntry(
                     Path.GetFileName(filePath),
-                    CompressionLevel.Optimal);
+                    CompressionLevel.Optimal
+                );
 
                 // Open once and hold the handle during the copy
-                using (FileStream inputStream = new FileStream(
-                    filePath,
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.Read,
-                    bufferSize: 81920,
-                    useAsync: true))
+                using (
+                    FileStream inputStream = new FileStream(
+                        filePath,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read,
+                        bufferSize: 81920,
+                        useAsync: true
+                    )
+                )
                 using (Stream entryStream = entry.Open())
                 {
                     await inputStream.CopyToAsync(entryStream).ConfigureAwait(false);
@@ -57,7 +65,8 @@ namespace NOBlackBox
         private static async Task WaitForFileAccessAsync(
             string filePath,
             int maxRetries,
-            int initialDelayMs)
+            int initialDelayMs
+        )
         {
             int delay = initialDelayMs;
 
@@ -65,11 +74,7 @@ namespace NOBlackBox
             {
                 try
                 {
-                    using (new FileStream(
-                        filePath,
-                        FileMode.Open,
-                        FileAccess.Read,
-                        FileShare.None))
+                    using (new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
                     {
                         // Successfully acquired exclusive access
                         return;
@@ -83,7 +88,8 @@ namespace NOBlackBox
             }
 
             throw new IOException(
-                $"The file '{filePath}' is still in use after {maxRetries} retries.");
+                $"The file '{filePath}' is still in use after {maxRetries} retries."
+            );
         }
 
         /// <summary>
@@ -92,9 +98,11 @@ namespace NOBlackBox
         public static async Task DeleteFileAsync(
             string filePath,
             int maxRetries = 5,
-            int initialDelayMs = 16)
+            int initialDelayMs = 16
+        )
         {
-            await WaitForFileAccessAsync(filePath, maxRetries, initialDelayMs).ConfigureAwait(false);
+            await WaitForFileAccessAsync(filePath, maxRetries, initialDelayMs)
+                .ConfigureAwait(false);
 
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
@@ -124,7 +132,8 @@ namespace NOBlackBox
             }
 
             throw new IOException(
-                $"Failed to delete file '{filePath}' after {maxRetries} retries.");
+                $"Failed to delete file '{filePath}' after {maxRetries} retries."
+            );
         }
     }
 }

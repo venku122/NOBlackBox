@@ -1,9 +1,9 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using HarmonyLib;
 using UnityEngine;
 
 namespace NOBlackBox
@@ -44,8 +44,8 @@ namespace NOBlackBox
             { "CRAM Trailer", "Ground+Medium+AntiAircraft+Vehicle"},
             { "Laser CIWS Trailer", "Ground+Medium+AntiAircraft+Vehicle" },
             { "Munitions Container", "Misc+Container" },
-			{ "Munitions Pallet", "Misc+Container" },
-			{ "Naval Supply Pallet", "Misc+Container" },
+            { "Munitions Pallet", "Misc+Container" },
+            { "Naval Supply Pallet", "Misc+Container" },
             { "MSV Flatbed", "Ground+Heavy+Vehicle" },
             { "MSV Tractor", "Ground+Heavy+Vehicle" },
             { "MSV Fuel Tanker", "Ground+Heavy+Vehicle" },
@@ -67,7 +67,7 @@ namespace NOBlackBox
             { "Wreck HLT", "Ground+Heavy+Vehicle" },
             { "Wreck MBT", "Ground+Heavy+Vehicle" }
 
-		};
+        };
         
 
         private readonly static Dictionary<string, int> RANGE = new()
@@ -87,8 +87,6 @@ namespace NOBlackBox
 
         public virtual void Init(GroundVehicle vehicle)
         {
-
-            
             base.unit = vehicle;
             base.unitId = unit.persistentID.Id;
             base.tacviewId = unit.persistentID.Id + 1;
@@ -106,10 +104,31 @@ namespace NOBlackBox
             int winningRange = 0;
             int.TryParse(info[2], out range1);
             int.TryParse(info[3], out range2);
-            if (range1 > range2) { winningRange = range1;  } else { winningRange = range2; }
+            if (range1 > range2)
+            {
+                winningRange = range1;
+            }
+            else
+            {
+                winningRange = range2;
+            }
 
-
-            if (new[] { "AA", "CIWS (L)", "CRAM", "SAM IR", "SAM R", "SPAAG", "RDR", "HPAD", "HGR-H", "HGR-M", "REV" }.Any(c => unit.definition.code.Contains(c)))
+            if (
+                new[]
+                {
+                    "AA",
+                    "CIWS (L)",
+                    "CRAM",
+                    "SAM IR",
+                    "SAM R",
+                    "SPAAG",
+                    "RDR",
+                    "HPAD",
+                    "HGR-H",
+                    "HGR-M",
+                    "REV",
+                }.Any(c => unit.definition.code.Contains(c))
+            )
             {
                 base.destroyedEvent = true;
             }
@@ -118,17 +137,21 @@ namespace NOBlackBox
             {
                 { "Name", this.unit.definition.unitName },
                 { "Coalition", faction?.factionName ?? "Neutral" },
-                { "CallSign", $"{unit.definition.code} {tacviewId:X}"},
-                { "Color", faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red") },
-                { "Type", info[1]},
+                { "CallSign", $"{unit.definition.code} {tacviewId:X}" },
+                {
+                    "Color",
+                    faction == null ? "Green" : (faction.factionName == "Boscali" ? "Blue" : "Red")
+                },
+                { "Type", info[1] },
                 { "EngagementRange", winningRange.ToString(CultureInfo.InvariantCulture) },
-                { "Debug", lastState.ToString()}
+                { "Debug", lastState.ToString() },
             };
             Plugin.recorderMono.GetComponent<Recorder_mono>().invokeWriterUpdate(this);
             props = [];
             this.enabled = true;
             base.enabled = true;
         }
+
         public override void Update()
         {
             if (!this.enabled || unit.disabled)
@@ -149,6 +172,7 @@ namespace NOBlackBox
             props = [];
             timer = 0;
         }
+
         internal override void UpdateTargets()
         {
             foreach (WeaponStation station in unit.weaponStations)
@@ -161,15 +185,21 @@ namespace NOBlackBox
                 {
                     //no target
                 }
-
             }
 
             if (targets.Any())
             {
                 if (Configuration.ResearchLoggingEnabled.Value)
                 {
-                    string targetIds = string.Join(", ", targets.Where(t => t != null).Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture)));
-                    Plugin.Logger?.LogInfo($"[R] GV {unit.definition.unitName} targets={targets.Length} ids=[{targetIds}]");
+                    string targetIds = string.Join(
+                        ", ",
+                        targets
+                            .Where(t => t != null)
+                            .Select(t => t.persistentID.Id.ToString(CultureInfo.InvariantCulture))
+                    );
+                    Plugin.Logger?.LogInfo(
+                        $"[R] GV {unit.definition.unitName} targets={targets.Length} ids=[{targetIds}]"
+                    );
                 }
 
                 if (!lastTargets.Any())
@@ -192,7 +222,9 @@ namespace NOBlackBox
                 if (targets.Length > 1)
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] GV EMIT LockedTarget (targets={targets.Length})");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] GV EMIT LockedTarget (targets={targets.Length})"
+                        );
                     for (int i = 0; i < max; i++)
                     {
                         if (i == 0)
@@ -203,16 +235,25 @@ namespace NOBlackBox
                         {
                             lockedTargetString = $"LockedTarget{i:X}";
                         }
-                        props.Add(lockedTargetString, $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}");
+                        props.Add(
+                            lockedTargetString,
+                            $"{GetTacviewIdOfUnit(targets[i].persistentID.Id):X}"
+                        );
                     }
                 }
                 else
                 {
                     if (Configuration.ResearchLoggingEnabled.Value)
-                        Plugin.Logger?.LogInfo($"[R] GV SKIP LockedTarget (targets={targets.Length} <= 1)");
+                        Plugin.Logger?.LogInfo(
+                            $"[R] GV SKIP LockedTarget (targets={targets.Length} <= 1)"
+                        );
                 }
 
-                ResearchReflectionProbe.DumpTargets(targets, unit.definition.unitName, unit.persistentID.Id);
+                ResearchReflectionProbe.DumpTargets(
+                    targets,
+                    unit.definition.unitName,
+                    unit.persistentID.Id
+                );
             }
             targets = [];
         }

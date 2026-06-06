@@ -11,7 +11,6 @@ using UnityEngine;
 using BepInEx.Unity.Mono;
 #endif
 
-
 namespace NOBlackBox
 {
     [BepInPlugin("xyz.KopterBuzz.NOBlackBox", "NOBlackBox", "0.3.8.2")]
@@ -22,15 +21,17 @@ namespace NOBlackBox
         internal static Plugin Instance;
 
         internal static new ManualLogSource? Logger;
-        internal static GameObject ?recorderMono;
+        internal static GameObject? recorderMono;
         internal static bool isRecording = false;
-        internal static GameObject ?autoSaveCountDown;
-        internal static GameObject ?recordingIndicator;
+        internal static GameObject? autoSaveCountDown;
+        internal static GameObject? recordingIndicator;
         private float waitTime = 0.2f;
         private float timer = 0f;
-        internal static int recordedScreenWidth, recordedScreenHeight;
-        internal static float guiAnchorLeft, guiAnchorRight;
-        internal static BasePlayer ?localPlayer = null;
+        internal static int recordedScreenWidth,
+            recordedScreenHeight;
+        internal static float guiAnchorLeft,
+            guiAnchorRight;
+        internal static BasePlayer? localPlayer = null;
 
         internal static bool recordingManually = false;
 
@@ -43,18 +44,17 @@ namespace NOBlackBox
 
         public static Dictionary<string, Dictionary<string, string[]>> NOBlackBoxUnitInfo = new()
         {
-            { "aircraft",   new Dictionary<string, string[]>() },
-            { "missiles",   new Dictionary<string, string[]>() },
-            { "ships",      new Dictionary<string, string[]>() },
-            { "vehicles",   new Dictionary<string, string[]>() }
-
+            { "aircraft", new Dictionary<string, string[]>() },
+            { "missiles", new Dictionary<string, string[]>() },
+            { "ships", new Dictionary<string, string[]>() },
+            { "vehicles", new Dictionary<string, string[]>() },
         };
-
 
         public Plugin()
         {
             //Logger = base.Logger;
         }
+
         private void Awake()
         {
             Instance = this;
@@ -98,7 +98,6 @@ namespace NOBlackBox
 
             OnGameStateChange += ResetRecordingManually;
             GameManager.OnGameStateChanged.AddListener(OnGameStateChange);
-
         }
 
         private void Update()
@@ -122,40 +121,37 @@ namespace NOBlackBox
                 recordingManually = true;
                 if (!isRecording)
                 {
-                    
                     StartRecording();
                     if (isRecording)
                     {
                         Logger?.LogDebug("RECORDING STARTED MANUALLY");
                     }
-                    
-                } else
+                }
+                else
                 {
                     StopRecording();
                     if (!isRecording)
                     {
                         Logger?.LogDebug("RECORDING STOPPED MANUALLY");
                     }
-                    
-                }    
+                }
             }
-
-            
 
             if (!isRecording && MissionManager.IsRunning && !recordingManually)
             {
                 if (Configuration.ResearchLoggingEnabled.Value)
-                    Plugin.Logger?.LogInfo($"[R] AutoStartTrigger MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}");
+                    Plugin.Logger?.LogInfo(
+                        $"[R] AutoStartTrigger MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}"
+                    );
                 StartRecording();
             }
-            
+
             if (isRecording && !MissionManager.IsRunning && !recordingManually)
             {
                 StopRecording();
             }
 
             UpdateGuiAnchors();
-
         }
 
         private static void UpdateGuiAnchors()
@@ -166,7 +162,6 @@ namespace NOBlackBox
             guiAnchorRight = (int)Math.Round(0.7 * recordedScreenWidth);
         }
 
-
         private void StartRecording()
         {
             if (isRecording)
@@ -174,13 +169,16 @@ namespace NOBlackBox
                 return;
             }
             isRecording = true;
-            UnityEngine.Debug.Log($"[NOBB] StartRecording called. isRecording={isRecording} recordingManually={recordingManually} MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}");
+            UnityEngine.Debug.Log(
+                $"[NOBB] StartRecording called. isRecording={isRecording} recordingManually={recordingManually} MissionManager.IsRunning={MissionManager.IsRunning} AutoStartRecording={Configuration.AutoStartRecording.Value}"
+            );
             if (Configuration.ResearchLoggingEnabled.Value)
-                Plugin.Logger?.LogInfo($"[R] StartRecording AutoStartRecording={Configuration.AutoStartRecording.Value} recordingManually={recordingManually}");
+                Plugin.Logger?.LogInfo(
+                    $"[R] StartRecording AutoStartRecording={Configuration.AutoStartRecording.Value} recordingManually={recordingManually}"
+                );
             recorderMono = new GameObject();
             recorderMono.AddComponent<Recorder_mono>();
             recorderMono.GetComponent<Recorder_mono>().enabled = true;
-            
 
             autoSaveCountDown = new GameObject();
             autoSaveCountDown.AddComponent<UIElements>();
@@ -204,8 +202,12 @@ namespace NOBlackBox
             GameObject.Destroy(autoSaveCountDown);
             GameObject.Destroy(recorderMono);
             //GameObject.Destroy(recordingIndicator);
-            ACMIObject_mono[] found = GameObject.FindObjectsByType<ACMIObject_mono>(FindObjectsSortMode.None);
-            ACMIFlare_mono[] foundFlares = GameObject.FindObjectsByType<ACMIFlare_mono>(FindObjectsSortMode.None);
+            ACMIObject_mono[] found = GameObject.FindObjectsByType<ACMIObject_mono>(
+                FindObjectsSortMode.None
+            );
+            ACMIFlare_mono[] foundFlares = GameObject.FindObjectsByType<ACMIFlare_mono>(
+                FindObjectsSortMode.None
+            );
             foreach (ACMIObject_mono obj in found)
             {
                 GameObject.Destroy(obj);
@@ -234,7 +236,8 @@ namespace NOBlackBox
             {
                 Plugin.Logger?.LogDebug($"{defaultPath} exists.");
                 ParsePluginUnitInfo(key, defaultPath);
-            } else
+            }
+            else
             {
                 Plugin.Logger?.LogDebug($"{defaultPath} DOES NOT exist.");
             }
@@ -252,7 +255,6 @@ namespace NOBlackBox
 
         private static void ParsePluginUnitInfo(string PluginUnitInfoKey, string path)
         {
-
             if (!File.Exists(path))
             {
                 return;
@@ -271,7 +273,10 @@ namespace NOBlackBox
         public static IEnumerable<string> GetTxtFilesExcludingDefault(string directoryPath)
         {
             if (string.IsNullOrWhiteSpace(directoryPath))
-                throw new ArgumentException("Directory path cannot be null or empty.", nameof(directoryPath));
+                throw new ArgumentException(
+                    "Directory path cannot be null or empty.",
+                    nameof(directoryPath)
+                );
 
             if (!Directory.Exists(directoryPath))
                 throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
@@ -282,7 +287,9 @@ namespace NOBlackBox
                     !string.Equals(
                         Path.GetFileName(file),
                         "default.txt",
-                        StringComparison.OrdinalIgnoreCase));
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
         }
     }
 

@@ -1,8 +1,8 @@
-﻿using BepInEx.Configuration;
-using System.Linq;
-using UnityEngine;
-using System;
+﻿using System;
 using System.Globalization;
+using System.Linq;
+using BepInEx.Configuration;
+using UnityEngine;
 
 namespace NOBlackBox
 {
@@ -43,12 +43,13 @@ namespace NOBlackBox
         internal const bool DefaultRecordExtraTelemetry = true;
 
         internal const bool DefaultEnableLogging = false;
-        
+
         internal const KeyCode DefaultGenerateHeightMapKey = KeyCode.F10;
         internal const int DefaultMetersPerScan = 4;
         internal const int DefaultHeightMapResolution = 4096;
         internal const bool DefaultEnableHeightmapGenerator = false;
         internal const bool DefaultTacviewBetaHeightMapGenerator = true;
+
         //internal const float DefaultOrtoGraphicSize = 5f;
 
         internal const float DefaultTextColorR = 1.0f;
@@ -67,11 +68,8 @@ namespace NOBlackBox
         internal static ConfigEntry<float> RecordingIndicatorX;
         internal static ConfigEntry<float> RecordingIndicatorY;
 
-
-
-
         internal const bool DefaultRecordEjectedPilots = false;
-        internal const bool DefaultAutoStartRecording = true;
+        internal const bool DefaultAutoStartRecording = false;
 
         internal const bool DefaultEnableUnitLogging = false;
         internal const bool DefaultEnableEncyclopediaExporter = false;
@@ -110,6 +108,7 @@ namespace NOBlackBox
         internal static ConfigEntry<int> MetersPerScan;
         internal static ConfigEntry<KeyboardShortcut> _GenerateHeightMapKey;
         internal static ConfigEntry<bool> EnableHeightmapGenerator;
+
         //internal static ConfigEntry <bool> TacviewBetaHeightMapGenerator;
         //internal static ConfigEntry<float> OrtoGraphicSize;
 
@@ -137,7 +136,7 @@ namespace NOBlackBox
         internal static ConfigEntry<bool> DestructionEvents;
 
         // Research probe toggles (local development only — never upstream)
-        internal const bool DefaultResearchLoggingEnabled = true;
+        internal const bool DefaultResearchLoggingEnabled = false;
         internal const float DefaultResearchDumpIntervalSeconds = 1f;
         internal const bool DefaultResearchDumpApiFields = true;
         internal const bool DefaultResearchDumpTargets = true;
@@ -157,181 +156,339 @@ namespace NOBlackBox
 
         internal static int UpdateRate
         {
-            get
-            {
-                return _UpdateRate.Value;
-            }
+            get { return _UpdateRate.Value; }
         }
 
         internal static string OutputPath
         {
-            get
-            {
-                return _OutputPath.Value;
-            }
+            get { return _OutputPath.Value; }
         }
 
         internal static int AutoSaveInterval
         {
-            get
-            {
-                return _AutoSaveInterval.Value;
-            }
+            get { return _AutoSaveInterval.Value; }
         }
 
         internal static bool CompressIDs
         {
-            get
-            {
-                return _CompressIDs.Value;
-            }
+            get { return _CompressIDs.Value; }
         }
 
         internal static bool GenerateHeightMapKey
         {
-            get
-            {
-                return _GenerateHeightMapKey.Value.IsDown();
-            }
+            get { return _GenerateHeightMapKey.Value.IsDown(); }
         }
-
 
         internal static void InitSettings(ConfigFile config)
         {
             Plugin.Logger?.LogDebug("Loading Settings.");
 
-            _UpdateRate = config.Bind(GeneralSettings, "UpdateRate", DefaultUpdateRate, "DEPRECATED. SEE THE OTHER UPDATE RATE SETTINGS");
+            _UpdateRate = config.Bind(
+                GeneralSettings,
+                "UpdateRate",
+                DefaultUpdateRate,
+                "DEPRECATED. SEE THE OTHER UPDATE RATE SETTINGS"
+            );
             Plugin.Logger?.LogDebug($"UpdateRate = {_UpdateRate.Value}");
             if (!Enumerable.Range(0, 1001).Contains(_UpdateRate.Value))
             {
-                Plugin.Logger?.LogWarning($"UpdateRate out of range! Setting default value {DefaultUpdateRate}!");
+                Plugin.Logger?.LogWarning(
+                    $"UpdateRate out of range! Setting default value {DefaultUpdateRate}!"
+                );
                 _UpdateRate.Value = DefaultUpdateRate;
             }
             //NEW UPDATE RATE SETTINGS
-            unitDiscoveryDelta = config.Bind(GeneralSettings, "Unit Discovery Rate", DefaultUnitDiscoveryDelta, $"Time interval in seconds to discover Units. Default = {DefaultUnitDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}");
+            unitDiscoveryDelta = config.Bind(
+                GeneralSettings,
+                "Unit Discovery Rate",
+                DefaultUnitDiscoveryDelta,
+                $"Time interval in seconds to discover Units. Default = {DefaultUnitDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (unitDiscoveryDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid unitDiscoveryDelta! Setting default value {DefaultUnitDiscoveryDelta}!");
-                Plugin.Logger?.LogDebug($"unitDiscoveryDelta = {unitDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid unitDiscoveryDelta! Setting default value {DefaultUnitDiscoveryDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"unitDiscoveryDelta = {unitDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            bulletSimDiscoveryDelta = config.Bind(GeneralSettings, "BulletSim Discovery Rate", DefaultBulletSimDiscoveryDelta, $"Time interval in seconds to discover objects that fire bullets. Default = {DefaultBulletSimDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}");
+            bulletSimDiscoveryDelta = config.Bind(
+                GeneralSettings,
+                "BulletSim Discovery Rate",
+                DefaultBulletSimDiscoveryDelta,
+                $"Time interval in seconds to discover objects that fire bullets. Default = {DefaultBulletSimDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (bulletSimDiscoveryDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid bulletSimDiscoveryDelta! Setting default value {DefaultBulletSimDiscoveryDelta}!");
-                Plugin.Logger?.LogDebug($"bulletSimDiscoveryDelta = {bulletSimDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid bulletSimDiscoveryDelta! Setting default value {DefaultBulletSimDiscoveryDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"bulletSimDiscoveryDelta = {bulletSimDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            shockwaveDiscoveryDelta = config.Bind(GeneralSettings, "Shockwave Discovery Rate", DefaultShockwaveDiscoveryDelta, $"Time interval in seconds to discover explosion shockwaves. Default = {DefaultShockwaveDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}");
+            shockwaveDiscoveryDelta = config.Bind(
+                GeneralSettings,
+                "Shockwave Discovery Rate",
+                DefaultShockwaveDiscoveryDelta,
+                $"Time interval in seconds to discover explosion shockwaves. Default = {DefaultShockwaveDiscoveryDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (shockwaveDiscoveryDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid shockwaveDiscoveryDelta! Setting default value {DefaultShockwaveDiscoveryDelta}!");
-                Plugin.Logger?.LogDebug($"shockwaveDiscoveryDelta = {shockwaveDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid shockwaveDiscoveryDelta! Setting default value {DefaultShockwaveDiscoveryDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"shockwaveDiscoveryDelta = {shockwaveDiscoveryDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            aircraftUpdateDelta = config.Bind(GeneralSettings, "Aircraft Update Rate", DefaultAircraftUpdateDelta, $"Time interval in seconds to update Aircraft. Default = {DefaultAircraftUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            aircraftUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Aircraft Update Rate",
+                DefaultAircraftUpdateDelta,
+                $"Time interval in seconds to update Aircraft. Default = {DefaultAircraftUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (aircraftUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid aircraftUpdateDelta! Setting default value {DefaultAircraftUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"aircraftUpdateDelta = {aircraftUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid aircraftUpdateDelta! Setting default value {DefaultAircraftUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"aircraftUpdateDelta = {aircraftUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            vehicleUpdateDelta = config.Bind(GeneralSettings, "Vehicle Update Rate", DefaultVehicleUpdateDelta, $"Time interval in seconds to update Vehicles and Ships. Default = {DefaultVehicleUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            vehicleUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Vehicle Update Rate",
+                DefaultVehicleUpdateDelta,
+                $"Time interval in seconds to update Vehicles and Ships. Default = {DefaultVehicleUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (vehicleUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid vehicleUpdateDelta! Setting default value {DefaultVehicleUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"vehicletUpdateDelta = {vehicleUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid vehicleUpdateDelta! Setting default value {DefaultVehicleUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"vehicletUpdateDelta = {vehicleUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            munitionUpdateDelta = config.Bind(GeneralSettings, "Munition Update Rate", DefaultMunitionUpdateDelta, $"Time interval in seconds to update Bombs, Missiles and Rockets. Default = {DefaultMunitionUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            munitionUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Munition Update Rate",
+                DefaultMunitionUpdateDelta,
+                $"Time interval in seconds to update Bombs, Missiles and Rockets. Default = {DefaultMunitionUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (munitionUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid munitionUpdateDelta! Setting default value {DefaultMunitionUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"munitionUpdateDelta = {munitionUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid munitionUpdateDelta! Setting default value {DefaultMunitionUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"munitionUpdateDelta = {munitionUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            shockwaveUpdateDelta = config.Bind(GeneralSettings, "Shockwave Update Rate", DefaultShockwaveUpdateDelta, $"Time interval in seconds to update Shockwave Propagation. Default = {DefaultShockwaveUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            shockwaveUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Shockwave Update Rate",
+                DefaultShockwaveUpdateDelta,
+                $"Time interval in seconds to update Shockwave Propagation. Default = {DefaultShockwaveUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (shockwaveUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid shockwaveUpdateDelta! Setting default value {DefaultShockwaveUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"aircraftUpdateDelta = {shockwaveUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid shockwaveUpdateDelta! Setting default value {DefaultShockwaveUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"aircraftUpdateDelta = {shockwaveUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            tracerUpdateDelta = config.Bind(GeneralSettings, "Tracer Update Rate", DefaultTracerUpdateDelta, $"Time interval in seconds to Projectile Tracers. Default = {DefaultTracerUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            tracerUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Tracer Update Rate",
+                DefaultTracerUpdateDelta,
+                $"Time interval in seconds to Projectile Tracers. Default = {DefaultTracerUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (tracerUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid tracerUpdateDelta! Setting default value {DefaultTracerUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"tracerUpdateDelta = {tracerUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid tracerUpdateDelta! Setting default value {DefaultTracerUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"tracerUpdateDelta = {tracerUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            flareUpdateDelta = config.Bind(GeneralSettings, "Flare Update Rate", DefaultFlareUpdateDelta, $"Time interval in seconds to update Flares. Default = {DefaultFlareUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            flareUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Flare Update Rate",
+                DefaultFlareUpdateDelta,
+                $"Time interval in seconds to update Flares. Default = {DefaultFlareUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (flareUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid flareUpdateDelta! Setting default value {DefaultFlareUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"flareUpdateDelta = {flareUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid flareUpdateDelta! Setting default value {DefaultFlareUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"flareUpdateDelta = {flareUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
-            buildingUpdateDelta = config.Bind(GeneralSettings, "Building Update Rate", DefaultBuildingUpdateDelta, $"Time interval in seconds to update Buildings. Default = {DefaultBuildingUpdateDelta.ToString(CultureInfo.InvariantCulture)}");
+            buildingUpdateDelta = config.Bind(
+                GeneralSettings,
+                "Building Update Rate",
+                DefaultBuildingUpdateDelta,
+                $"Time interval in seconds to update Buildings. Default = {DefaultBuildingUpdateDelta.ToString(CultureInfo.InvariantCulture)}"
+            );
             if (buildingUpdateDelta.Value <= 0f)
             {
-                Plugin.Logger?.LogWarning($"Invalid buildingUpdateDelta! Setting default value {DefaultBuildingUpdateDelta}!");
-                Plugin.Logger?.LogDebug($"buildingUpdateDelta = {buildingUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid buildingUpdateDelta! Setting default value {DefaultBuildingUpdateDelta}!"
+                );
+                Plugin.Logger?.LogDebug(
+                    $"buildingUpdateDelta = {buildingUpdateDelta.Value.ToString(CultureInfo.InvariantCulture)}"
+                );
             }
 
-
             string DefaultOutputPath = Application.persistentDataPath + "/Replays/";
-            _OutputPath = config.Bind(GeneralSettings, "OutputPath", DefaultOutputPath, "The location where Tacview files will be saved. Must be a valid folder path.");
+            _OutputPath = config.Bind(
+                GeneralSettings,
+                "OutputPath",
+                DefaultOutputPath,
+                "The location where Tacview files will be saved. Must be a valid folder path."
+            );
             Plugin.Logger?.LogDebug($"OutputPath = {_OutputPath.Value}");
 
             (bool isFolder, bool success) = Helpers.IsFileOrFolder(_OutputPath.Value);
             if (!isFolder || !success)
             {
-                Plugin.Logger?.LogWarning($"Invalid OutputPath! Setting default value {DefaultOutputPath}!");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid OutputPath! Setting default value {DefaultOutputPath}!"
+                );
                 _OutputPath.Value = DefaultOutputPath;
             }
 
-            _AutoSaveInterval = config.Bind(GeneralSettings, "AutoSaveInterval", DefaultAutoSaveInterval, "Time interval for automatically updating the Tacview file. Min value: 60");
+            _AutoSaveInterval = config.Bind(
+                GeneralSettings,
+                "AutoSaveInterval",
+                DefaultAutoSaveInterval,
+                "Time interval for automatically updating the Tacview file. Min value: 60"
+            );
             Plugin.Logger?.LogDebug($"AutoSaveInterval = {_AutoSaveInterval.Value}");
 
             if (_AutoSaveInterval.Value < 60)
             {
-                Plugin.Logger?.LogWarning($"Invalid AutoSaveInterval! Setting default value {DefaultAutoSaveInterval}!");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid AutoSaveInterval! Setting default value {DefaultAutoSaveInterval}!"
+                );
                 _AutoSaveInterval.Value = DefaultAutoSaveInterval;
             }
 
-            UseMissionTime = config.Bind(OptionalDataSettings, "UseMissionTime", DefaultUseMissionTime, "Use Mission (true) or Server Time (false) for the clock in the recording.");
+            UseMissionTime = config.Bind(
+                OptionalDataSettings,
+                "UseMissionTime",
+                DefaultUseMissionTime,
+                "Use Mission (true) or Server Time (false) for the clock in the recording."
+            );
             Plugin.Logger?.LogDebug($"UseMissionTime = {UseMissionTime.Value}");
 
-            RecordSteamID = config.Bind(OptionalDataSettings, "RecordSteamID", DefaultRecordSteamID, "Record Steam ID in the Registration label of player aircraft objects.");
+            RecordSteamID = config.Bind(
+                OptionalDataSettings,
+                "RecordSteamID",
+                DefaultRecordSteamID,
+                "Record Steam ID in the Registration label of player aircraft objects."
+            );
             Plugin.Logger?.LogDebug($"RecordSteamID = {RecordSteamID.Value}");
 
-            RecordSpeed = config.Bind(OptionalDataSettings, "RecordSpeed", DefaultRecordSpeed, "Toggle recording True Airspeed and Mach number. Default: true");
+            RecordSpeed = config.Bind(
+                OptionalDataSettings,
+                "RecordSpeed",
+                DefaultRecordSpeed,
+                "Toggle recording True Airspeed and Mach number. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordSpeed = {RecordSpeed?.Value}");
 
-            RecordAOA = config.Bind(OptionalDataSettings, "RecordAOA", DefaultRecordAOA, "Toggle recording Angle of Attack. Default: true");
+            RecordAOA = config.Bind(
+                OptionalDataSettings,
+                "RecordAOA",
+                DefaultRecordAOA,
+                "Toggle recording Angle of Attack. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordAOA = {RecordAOA?.Value}");
 
-            RecordAGL = config.Bind(OptionalDataSettings, "RecordAGL", DefaultRecordAGL, "Toggle recording height above ground level. Default: true");
+            RecordAGL = config.Bind(
+                OptionalDataSettings,
+                "RecordAGL",
+                DefaultRecordAGL,
+                "Toggle recording height above ground level. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordAGL = {RecordAGL?.Value}");
 
-            RecordRadarMode = config.Bind(OptionalDataSettings, "RecordRadarMode", DefaultRecordRadarMode, "Toggle recording radar mode changes. Default: true");
+            RecordRadarMode = config.Bind(
+                OptionalDataSettings,
+                "RecordRadarMode",
+                DefaultRecordRadarMode,
+                "Toggle recording radar mode changes. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordRadarMode = {RecordRadarMode?.Value}");
 
-            RecordLandingGear = config.Bind(OptionalDataSettings, "RecordLandingGear", DefaultRecordLandingGear, "Toggle recording landing gear changes. Default: true");
+            RecordLandingGear = config.Bind(
+                OptionalDataSettings,
+                "RecordLandingGear",
+                DefaultRecordLandingGear,
+                "Toggle recording landing gear changes. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordLandingGear = {RecordLandingGear?.Value}");
 
-            RecordPilotHead = config.Bind(OptionalDataSettings, "RecordPilotHead", DefaultRecordPilotHead, "Toggle recording pilot head movement. Default: true");
+            RecordPilotHead = config.Bind(
+                OptionalDataSettings,
+                "RecordPilotHead",
+                DefaultRecordPilotHead,
+                "Toggle recording pilot head movement. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordPilotHead = {RecordPilotHead?.Value}");
 
-            RecordExtraTelemetry = config.Bind(OptionalDataSettings, "RecordExtraTelemetry", DefaultRecordExtraTelemetry, "Toggle recording Extra Telemetry. Default: true");
+            RecordExtraTelemetry = config.Bind(
+                OptionalDataSettings,
+                "RecordExtraTelemetry",
+                DefaultRecordExtraTelemetry,
+                "Toggle recording Extra Telemetry. Default: true"
+            );
             Plugin.Logger?.LogDebug($"RecordExtraTelemetry = {RecordExtraTelemetry?.Value}");
 
-            _CompressIDs = config.Bind(OptionalDataSettings, "CompressIDs", DefaultCompressIDs, "Compress IDs to reduce filesize with less determinism.");
+            _CompressIDs = config.Bind(
+                OptionalDataSettings,
+                "CompressIDs",
+                DefaultCompressIDs,
+                "Compress IDs to reduce filesize with less determinism."
+            );
             Plugin.Logger?.LogDebug($"CompressIDs = {_CompressIDs.Value}");
 
-            MetersPerScan = config.Bind(HeightMapGeneratorSettings, "MetersPerScan", DefaultMetersPerScan, "Sample rate of the Heightmap generator. Does a scan per X meter. Default: 4");
+            MetersPerScan = config.Bind(
+                HeightMapGeneratorSettings,
+                "MetersPerScan",
+                DefaultMetersPerScan,
+                "Sample rate of the Heightmap generator. Does a scan per X meter. Default: 4"
+            );
             if (MetersPerScan.Value < 1)
             {
-                Plugin.Logger?.LogWarning($"Invalid MetersPerScan! Setting default value {DefaultMetersPerScan}!");
+                Plugin.Logger?.LogWarning(
+                    $"Invalid MetersPerScan! Setting default value {DefaultMetersPerScan}!"
+                );
                 MetersPerScan.Value = DefaultMetersPerScan;
             }
             Plugin.Logger?.LogDebug($"MetersPerScan = {MetersPerScan.Value}");
 
-            HeightMapResolution = config.Bind(HeightMapGeneratorSettings, "HeightMapResolution", DefaultHeightMapResolution, "Resolution of the Heightmap. Must be divisible by 4. Default: 4096");
+            HeightMapResolution = config.Bind(
+                HeightMapGeneratorSettings,
+                "HeightMapResolution",
+                DefaultHeightMapResolution,
+                "Resolution of the Heightmap. Must be divisible by 4. Default: 4096"
+            );
             if ((HeightMapResolution.Value % 4) != 0)
             {
-                Plugin.Logger?.LogWarning($"HeightMapResolution must be divisible by 4! Setting default value {DefaultHeightMapResolution}!");
+                Plugin.Logger?.LogWarning(
+                    $"HeightMapResolution must be divisible by 4! Setting default value {DefaultHeightMapResolution}!"
+                );
                 HeightMapResolution.Value = DefaultHeightMapResolution;
             }
             Plugin.Logger?.LogDebug($"HeightMapResolution = {HeightMapResolution.Value}");
@@ -344,130 +501,274 @@ namespace NOBlackBox
             }
             Plugin.Logger?.LogDebug($"OrtographicSize = {OrtoGraphicSize.Value}");
             */
-            _GenerateHeightMapKey = config.Bind("Hotkeys", "Generate Heightmap", new KeyboardShortcut(DefaultGenerateHeightMapKey));
+            _GenerateHeightMapKey = config.Bind(
+                "Hotkeys",
+                "Generate Heightmap",
+                new KeyboardShortcut(DefaultGenerateHeightMapKey)
+            );
             Plugin.Logger?.LogDebug($"Generate Heightmap key = {_GenerateHeightMapKey.Value}");
 
-            EnableHeightmapGenerator = config.Bind(HeightMapGeneratorSettings, "EnableHeightmapGenerator", DefaultEnableHeightmapGenerator, "Enable/Disable Heightmap Generator. Default: false");
+            EnableHeightmapGenerator = config.Bind(
+                HeightMapGeneratorSettings,
+                "EnableHeightmapGenerator",
+                DefaultEnableHeightmapGenerator,
+                "Enable/Disable Heightmap Generator. Default: false"
+            );
             Plugin.Logger?.LogDebug($"EnableHeightmapGenerator = {EnableHeightmapGenerator.Value}");
 
             //TacviewBetaHeightMapGenerator = config.Bind(HeightMapGeneratorSettings, "TacviewBetaHeightMapGenerator", DefaultTacviewBetaHeightMapGenerator, "True: Compatibility set for Tacview 1.9.5 Beta 11, False: Compatibility set for Tacview Stable. Default: True");
             //Plugin.Logger?.LogDebug($"TacviewBetaHeightMapGenerator = {TacviewBetaHeightMapGenerator.Value}");
 
-            RecordEjectedPilots = config.Bind(GeneralSettings, "RecordEjectedPilots", DefaultRecordEjectedPilots, "Toggle Recording Ejected Pilots.");
+            RecordEjectedPilots = config.Bind(
+                GeneralSettings,
+                "RecordEjectedPilots",
+                DefaultRecordEjectedPilots,
+                "Toggle Recording Ejected Pilots."
+            );
             Plugin.Logger?.LogDebug($"RecordEjectedPilots = {RecordEjectedPilots.Value}");
 
-            DestructionEvents = config.Bind(GeneralSettings, "DestructionEvents", DefaultDestructionEvents, "Toggle Recording Destruction Events for Buildings and Ships.");
+            DestructionEvents = config.Bind(
+                GeneralSettings,
+                "DestructionEvents",
+                DefaultDestructionEvents,
+                "Toggle Recording Destruction Events for Buildings and Ships."
+            );
             Plugin.Logger?.LogDebug($"DestructionEvents = {DestructionEvents.Value}");
 
-            AutoStartRecording = config.Bind(GeneralSettings, "AutoStartRecording", DefaultAutoStartRecording, "Toggle Automatically starting to record on mission load.");
+            AutoStartRecording = config.Bind(
+                GeneralSettings,
+                "AutoStartRecording",
+                DefaultAutoStartRecording,
+                "Toggle Automatically starting to record on mission load."
+            );
             Plugin.Logger?.LogDebug($"AutoStartRecording = {AutoStartRecording.Value}");
 
-            EnableAutoSaveCountDown = config.Bind(VisualSettings, "EnableAutoSaveCountDown", DefaultEnableAutoSaveCountDown, "Toggle AutoSave Countdown Timer.");
+            EnableAutoSaveCountDown = config.Bind(
+                VisualSettings,
+                "EnableAutoSaveCountDown",
+                DefaultEnableAutoSaveCountDown,
+                "Toggle AutoSave Countdown Timer."
+            );
             Plugin.Logger?.LogDebug($"EnableAutoSaveCountDown = {EnableAutoSaveCountDown.Value}");
 
-            EnableRecordingIndicator = config.Bind(VisualSettings, "EnableRecordingIndicator", DefaultEnableRecordingIndicator, "Toggle Recording Indicator.");
+            EnableRecordingIndicator = config.Bind(
+                VisualSettings,
+                "EnableRecordingIndicator",
+                DefaultEnableRecordingIndicator,
+                "Toggle Recording Indicator."
+            );
             Plugin.Logger?.LogDebug($"EnableRecordingIndicator = {EnableRecordingIndicator.Value}");
 
-            AutoSaveCountDownX = config.Bind(VisualSettings, "AutoSaveCountDownX", DefaultAutoSaveCountDownX, "X coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0");
+            AutoSaveCountDownX = config.Bind(
+                VisualSettings,
+                "AutoSaveCountDownX",
+                DefaultAutoSaveCountDownX,
+                "X coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0"
+            );
             if (AutoSaveCountDownX.Value < 0f || AutoSaveCountDownX.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"AutoSaveCountDownX must be within 0.0 - 1.0 range! Setting default value {DefaultAutoSaveCountDownX}!");
+                Plugin.Logger?.LogWarning(
+                    $"AutoSaveCountDownX must be within 0.0 - 1.0 range! Setting default value {DefaultAutoSaveCountDownX}!"
+                );
             }
             Plugin.Logger?.LogDebug($"AutoSaveCountDownX = {AutoSaveCountDownX.Value}");
 
-            RecordingIndicatorY = config.Bind(VisualSettings, "RecordingIndicatorY", DefaultRecordingIndicatorY, "Y coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0");
+            RecordingIndicatorY = config.Bind(
+                VisualSettings,
+                "RecordingIndicatorY",
+                DefaultRecordingIndicatorY,
+                "Y coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0"
+            );
             if (RecordingIndicatorY.Value < 0f || RecordingIndicatorY.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"RecordingIndicatorX must be within 0.0 - 1.0 range! Setting default value {DefaultRecordingIndicatorX}!");
+                Plugin.Logger?.LogWarning(
+                    $"RecordingIndicatorX must be within 0.0 - 1.0 range! Setting default value {DefaultRecordingIndicatorX}!"
+                );
             }
             Plugin.Logger?.LogDebug($"RecordingIndicatorX = {RecordingIndicatorY.Value}");
 
-            RecordingIndicatorX = config.Bind(VisualSettings, "RecordingIndicatorX", DefaultRecordingIndicatorX, "X coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0");
+            RecordingIndicatorX = config.Bind(
+                VisualSettings,
+                "RecordingIndicatorX",
+                DefaultRecordingIndicatorX,
+                "X coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0"
+            );
             if (RecordingIndicatorX.Value < 0f || RecordingIndicatorX.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"RecordingIndicatorX must be within 0.0 - 1.0 range! Setting default value {DefaultRecordingIndicatorX}!");
+                Plugin.Logger?.LogWarning(
+                    $"RecordingIndicatorX must be within 0.0 - 1.0 range! Setting default value {DefaultRecordingIndicatorX}!"
+                );
             }
             Plugin.Logger?.LogDebug($"RecordingIndicatorX = {RecordingIndicatorX.Value}");
 
-            AutoSaveCountDownY = config.Bind(VisualSettings, "AutoSaveCountDownY", DefaultAutoSaveCountDownY, "Y coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0");
+            AutoSaveCountDownY = config.Bind(
+                VisualSettings,
+                "AutoSaveCountDownY",
+                DefaultAutoSaveCountDownY,
+                "Y coordinate of Auto Save Countdown Timer on GUI. Scales with Resolution. Value range: 0.0 - 1.0"
+            );
             if (AutoSaveCountDownY.Value < 0f || AutoSaveCountDownY.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"AutoSaveCountDownX must be within 0.0 - 1.0 range! Setting default value {DefaultAutoSaveCountDownX}!");
+                Plugin.Logger?.LogWarning(
+                    $"AutoSaveCountDownX must be within 0.0 - 1.0 range! Setting default value {DefaultAutoSaveCountDownX}!"
+                );
             }
             Plugin.Logger?.LogDebug($"AutoSaveCountDownX = {AutoSaveCountDownY.Value}");
 
-            TextColorR = config.Bind(VisualSettings, "TextColorR", DefaultTextColorR, "Red color value for GUI Text. Value range: 0.0 - 1.0");
+            TextColorR = config.Bind(
+                VisualSettings,
+                "TextColorR",
+                DefaultTextColorR,
+                "Red color value for GUI Text. Value range: 0.0 - 1.0"
+            );
             if (TextColorR.Value < 0f || TextColorR.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"TextColorR must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorR}!");
+                Plugin.Logger?.LogWarning(
+                    $"TextColorR must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorR}!"
+                );
             }
             Plugin.Logger?.LogDebug($"TextColorR = {TextColorR.Value}");
 
-            TextColorG = config.Bind(VisualSettings, "TextColorG", DefaultTextColorG, "Green color value for GUI Text. Value range: 0.0 - 1.0");
+            TextColorG = config.Bind(
+                VisualSettings,
+                "TextColorG",
+                DefaultTextColorG,
+                "Green color value for GUI Text. Value range: 0.0 - 1.0"
+            );
             if (TextColorG.Value < 0f || TextColorG.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"TextColorG must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorG}!");
+                Plugin.Logger?.LogWarning(
+                    $"TextColorG must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorG}!"
+                );
             }
             Plugin.Logger?.LogDebug($"TextColorG = {TextColorG.Value}");
 
-            TextColorB = config.Bind(VisualSettings, "TextColorB", DefaultTextColorB, "Blue color value for GUI Text. Value range: 0.0 - 1.0");
+            TextColorB = config.Bind(
+                VisualSettings,
+                "TextColorB",
+                DefaultTextColorB,
+                "Blue color value for GUI Text. Value range: 0.0 - 1.0"
+            );
             if (TextColorB.Value < 0f || TextColorB.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"TextColorB must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorB}!");
+                Plugin.Logger?.LogWarning(
+                    $"TextColorB must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorB}!"
+                );
             }
             Plugin.Logger?.LogDebug($"TextColorB = {TextColorB.Value}");
 
-            TextColorA = config.Bind(VisualSettings, "TextColorA", DefaultTextColorA, "Transparency value for GUI Text. Value range: 0.0 - 1.0");
+            TextColorA = config.Bind(
+                VisualSettings,
+                "TextColorA",
+                DefaultTextColorA,
+                "Transparency value for GUI Text. Value range: 0.0 - 1.0"
+            );
             if (TextColorA.Value < 0f || TextColorA.Value > 1.0f)
             {
-                Plugin.Logger?.LogWarning($"TextColorA must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorA}!");
+                Plugin.Logger?.LogWarning(
+                    $"TextColorA must be within 0.0 - 1.0 range! Setting default value {DefaultTextColorA}!"
+                );
             }
             Plugin.Logger?.LogDebug($"TextColorA = {TextColorA.Value}");
 
-            EnableUnitLogging = config.Bind(DeveloperFeatures, "EnableUnknownUnitLogging", DefaultEnableUnitLogging, "Toggle logging Unknown Units that are unknown to ACMI Recorder. Default: false");
+            EnableUnitLogging = config.Bind(
+                DeveloperFeatures,
+                "EnableUnknownUnitLogging",
+                DefaultEnableUnitLogging,
+                "Toggle logging Unknown Units that are unknown to ACMI Recorder. Default: false"
+            );
             Plugin.Logger?.LogDebug($"EnableUnknownUnitLogging = {EnableUnitLogging.Value}");
 
-            EnableEncyclopediaExporter = config.Bind(DeveloperFeatures, "EnableEncyclopediaExporter", DefaultEnableEncyclopediaExporter, "Toggle Encyclopedia Exporter. Default: false");
-            Plugin.Logger?.LogDebug($"EnableEncyclopediaExporter = {EnableEncyclopediaExporter.Value}");
+            EnableEncyclopediaExporter = config.Bind(
+                DeveloperFeatures,
+                "EnableEncyclopediaExporter",
+                DefaultEnableEncyclopediaExporter,
+                "Toggle Encyclopedia Exporter. Default: false"
+            );
+            Plugin.Logger?.LogDebug(
+                $"EnableEncyclopediaExporter = {EnableEncyclopediaExporter.Value}"
+            );
 
-            EncyclopediaExporterKey = config.Bind("Hotkeys", "EncyclopediaExporterKey", new KeyboardShortcut(DefaultEncyclopediaExporterKey));
+            EncyclopediaExporterKey = config.Bind(
+                "Hotkeys",
+                "EncyclopediaExporterKey",
+                new KeyboardShortcut(DefaultEncyclopediaExporterKey)
+            );
             Plugin.Logger?.LogDebug($"EncyclopediaExporterKey = {EncyclopediaExporterKey.Value}");
 
-            StartStopRecordingKey = config.Bind("Hotkeys", "StartStopRecordingKey", new KeyboardShortcut(DefaultStartStopRecordingKey));
+            StartStopRecordingKey = config.Bind(
+                "Hotkeys",
+                "StartStopRecordingKey",
+                new KeyboardShortcut(DefaultStartStopRecordingKey)
+            );
             Plugin.Logger?.LogDebug($"StartStopRecordingKey = {StartStopRecordingKey.Value}");
 
-            EnableLogging = config.Bind(DeveloperFeatures, "EnableLogging", DefaultEnableLogging, "Toggle Logging. Default: false");
+            EnableLogging = config.Bind(
+                DeveloperFeatures,
+                "EnableLogging",
+                DefaultEnableLogging,
+                "Toggle Logging. Default: false"
+            );
             Plugin.Logger?.LogDebug($"EnableLogging = {EnableLogging.Value}");
 
             // Research section (local development only — never upstream)
-            ResearchLoggingEnabled = config.Bind(ResearchSettings, "ResearchLoggingEnabled",
-                DefaultResearchLoggingEnabled, "Enable verbose research logging.");
+            ResearchLoggingEnabled = config.Bind(
+                ResearchSettings,
+                "ResearchLoggingEnabled",
+                DefaultResearchLoggingEnabled,
+                "Enable verbose research logging."
+            );
             Plugin.Logger?.LogDebug($"ResearchLoggingEnabled = {ResearchLoggingEnabled.Value}");
 
-            ResearchDumpIntervalSeconds = config.Bind(ResearchSettings, "ResearchDumpIntervalSeconds",
-                DefaultResearchDumpIntervalSeconds, "Seconds between research data dumps.");
-            Plugin.Logger?.LogDebug($"ResearchDumpIntervalSeconds = {ResearchDumpIntervalSeconds.Value}");
+            ResearchDumpIntervalSeconds = config.Bind(
+                ResearchSettings,
+                "ResearchDumpIntervalSeconds",
+                DefaultResearchDumpIntervalSeconds,
+                "Seconds between research data dumps."
+            );
+            Plugin.Logger?.LogDebug(
+                $"ResearchDumpIntervalSeconds = {ResearchDumpIntervalSeconds.Value}"
+            );
 
-            ResearchDumpApiFields = config.Bind(ResearchSettings, "ResearchDumpApiFields",
-                DefaultResearchDumpApiFields, "Dump unknown game object fields via reflection.");
+            ResearchDumpApiFields = config.Bind(
+                ResearchSettings,
+                "ResearchDumpApiFields",
+                DefaultResearchDumpApiFields,
+                "Dump unknown game object fields via reflection."
+            );
             Plugin.Logger?.LogDebug($"ResearchDumpApiFields = {ResearchDumpApiFields.Value}");
 
-            ResearchDumpTargets = config.Bind(ResearchSettings, "ResearchDumpTargets",
-                DefaultResearchDumpTargets, "Dump target list contents for all units.");
+            ResearchDumpTargets = config.Bind(
+                ResearchSettings,
+                "ResearchDumpTargets",
+                DefaultResearchDumpTargets,
+                "Dump target list contents for all units."
+            );
             Plugin.Logger?.LogDebug($"ResearchDumpTargets = {ResearchDumpTargets.Value}");
 
-            ResearchDumpEW = config.Bind(ResearchSettings, "ResearchDumpEW",
-                DefaultResearchDumpEW, "Dump electronic warfare / jammer state.");
+            ResearchDumpEW = config.Bind(
+                ResearchSettings,
+                "ResearchDumpEW",
+                DefaultResearchDumpEW,
+                "Dump electronic warfare / jammer state."
+            );
             Plugin.Logger?.LogDebug($"ResearchDumpEW = {ResearchDumpEW.Value}");
 
-            ResearchDumpDetection = config.Bind(ResearchSettings, "ResearchDumpDetection",
-                DefaultResearchDumpDetection, "Dump detection/datalink state.");
+            ResearchDumpDetection = config.Bind(
+                ResearchSettings,
+                "ResearchDumpDetection",
+                DefaultResearchDumpDetection,
+                "Dump detection/datalink state."
+            );
             Plugin.Logger?.LogDebug($"ResearchDumpDetection = {ResearchDumpDetection.Value}");
 
-            ResearchDumpBuildings = config.Bind(ResearchSettings, "ResearchDumpBuildings",
-                DefaultResearchDumpBuildings, "Dump building/scenery object counts and types.");
+            ResearchDumpBuildings = config.Bind(
+                ResearchSettings,
+                "ResearchDumpBuildings",
+                DefaultResearchDumpBuildings,
+                "Dump building/scenery object counts and types."
+            );
             Plugin.Logger?.LogDebug($"ResearchDumpBuildings = {ResearchDumpBuildings.Value}");
-
         }
     }
 }

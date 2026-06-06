@@ -17,10 +17,7 @@ namespace NOBlackBox
 
         public override IFormatProvider FormatProvider
         {
-            get
-            {
-                return this.formatProvider;
-            }
+            get { return this.formatProvider; }
         }
     }
 }
